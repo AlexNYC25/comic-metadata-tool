@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://www.denvog.com/comet/"
+    xmlns="http://www.denvog.com/comet/"
+    elementFormDefault="qualified">
+
+    <xs:element name="comet">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="title" type="xs:string" maxOccurs="1"/>
+                <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="series" type="xs:string" maxOccurs="1"/>
+                <xs:element name="issue" type="xs:positiveInteger" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="volume" type="xs:positiveInteger" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="publisher" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="date" type="xs:date" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="genre" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="character" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="isVersionOf" type="xs:string" minOccurs="0"/>
+                <xs:element name="price" type="xs:decimal" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="format" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="language" type="xs:language" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="rating" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="rights" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="identifier" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="pages" type="xs:positiveInteger" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="creator" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="writer" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="penciller" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="editor" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="coverDesigner" type="xs:string" minOccurs="0"/>
+                <xs:element name="letterer" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="inker" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="colorist" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="coverImage" type="xs:string" minOccurs="0"/>
+                <xs:element name="lastMark" type="xs:positiveInteger" minOccurs="0"/>
+                <xs:element name="readingDirection">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="ltr"/>
+                            <xs:enumeration value="rtl"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

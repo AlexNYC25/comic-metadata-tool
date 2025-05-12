@@ -1,13 +1,11 @@
 // parser.ts
 import { XMLParser, XMLValidator, X2jOptions } from "fast-xml-parser";
-import { Comet } from "../interfaces/comet";
-import {
-  ComicInfo,
-  ComicPageInfo,
-  YesNo,
-  Manga,
-  AgeRating,
-} from "../interfaces/comicInfo";
+import { CoMet } from "../interfaces/comet";
+import { ComicInfo } from "../interfaces/comicInfo";
+import { ComicPageInfo } from "../interfaces/metadata-parts/comic-page-info";
+import { YesNo } from "../types/yes-no";
+import { Manga } from "../types/manga";
+import { AgeRating } from "../types/age-rating";
 
 /**
  * Validates & parses an XML string into a JavaScript object.
@@ -23,7 +21,12 @@ export function parseXml<T = unknown>(
       `Invalid XML at line ${err.line}, col ${err.col}: ${err.msg}`
     );
   }
-  const parser = new XMLParser(options);
+  const parser = new XMLParser({
+    ...options,
+    ignoreAttributes: false,
+    parseTagValue: false, // Prevent parsing empty tags as strings
+    parseAttributeValue: true,
+  });
   return parser.parse(xmlContent) as T;
 }
 
@@ -36,7 +39,7 @@ function ensureArray<T>(val?: T | T[]): T[] {
 /**
  * Parse a `<comet>…</comet>` document into our `Comet` interface.
  */
-export function parseCometXml(xml: string): Comet {
+export function parseCometXml(xml: string): CoMet {
   const raw = parseXml<{ comet: any }>(xml, {
     ignoreNameSpace: true,
     attributeNamePrefix: "",
@@ -65,7 +68,7 @@ export function parseCometXml(xml: string): Comet {
     rating: c.rating,
     rights: c.rights,
     identifier: c.identifier,
-    pages: ensureArray(c.pages),
+    pages: c.pages,
     creator: ensureArray(c.creator),
     writer: ensureArray(c.writer),
     penciller: ensureArray(c.penciller),

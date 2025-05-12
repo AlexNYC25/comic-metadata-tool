@@ -1,4 +1,4 @@
-export interface Comet {
+export interface CoMet {
   /** `<title>` (required) */
   title: string;
 

@@ -1,62 +1,7 @@
-// common simple types
-export type YesNo = "Unknown" | "No" | "Yes";
-export type Manga = YesNo | "YesAndRightToLeft";
-export type AgeRating =
-  | "Unknown"
-  | "Adults Only 18+"
-  | "Early Childhood"
-  | "Everyone"
-  | "Everyone 10+"
-  | "G"
-  | "Kids to Adults"
-  | "M"
-  | "MA15+"
-  | "Mature 17+"
-  | "PG"
-  | "R18+"
-  | "Rating Pending"
-  | "Teen"
-  | "X18+";
-
-// page‐type list shared by both versions
-export type ComicPageType =
-  | "FrontCover"
-  | "InnerCover"
-  | "Roundup"
-  | "Story"
-  | "Advertisement"
-  | "Editorial"
-  | "Letters"
-  | "Preview"
-  | "BackCover"
-  | "Other"
-  | "Deleted";
-
-export interface ComicPageInfo {
-  /** @attribute Image (required) */
-  Image: number;
-
-  /** @attribute Type (default="Story") */
-  Type?: ComicPageType;
-
-  /** @attribute DoublePage (default="false") */
-  DoublePage?: boolean;
-
-  /** @attribute ImageSize (default="0") */
-  ImageSize?: number;
-
-  /** @attribute Key (default="") */
-  Key?: string;
-
-  /** v2 only: @attribute Bookmark (default="") */
-  Bookmark?: string;
-
-  /** @attribute ImageWidth (default="-1") */
-  ImageWidth?: number;
-
-  /** @attribute ImageHeight (default="-1") */
-  ImageHeight?: number;
-}
+import { AgeRating } from "../types/age-rating";
+import { YesNo } from "../types/yes-no";
+import { Manga } from "../types/manga";
+import { ComicPageInfo } from "./metadata-parts/comic-page-info";
 
 export interface ComicInfo {
   Title?: string;

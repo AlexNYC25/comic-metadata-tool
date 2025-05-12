@@ -1,0 +1,16 @@
+export type AgeRating =
+  | "Unknown"
+  | "Adults Only 18+"
+  | "Early Childhood"
+  | "Everyone"
+  | "Everyone 10+"
+  | "G"
+  | "Kids to Adults"
+  | "M"
+  | "MA15+"
+  | "Mature 17+"
+  | "PG"
+  | "R18+"
+  | "Rating Pending"
+  | "Teen"
+  | "X18+";

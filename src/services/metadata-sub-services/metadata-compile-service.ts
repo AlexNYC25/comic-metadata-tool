@@ -9,156 +9,106 @@ import { extract7zEntryToTemp } from "../../utils/7z-utils";
 import {
   convertParsedXmlToComicInfo,
   convertParsedXmlToCoMet,
-} from "./metadata-zip-compile-service-conversions";
+} from "./metadata-compile-service-conversions";
 
 /**
- * Converts the raw ComicInfo XML data to a ComicInfo object.
- * @param metadata
- * @param comicInfoXmlFile
- * @returns Promise<MetadataCompiled>
+ * Extracts raw XML content from an archive based on its type.
+ * @param archiveType - The type of the archive (zip, rar, 7z).
+ * @param archivePath - The path to the archive file.
+ * @param entryName - The name of the entry to extract.
+ * @returns {Promise<string>} - The raw XML content as a string.
+ * @throws {Error} - Throws an error if the archive type is unsupported.
+ */
+async function getEntryRawContent(
+  archiveType: string,
+  archivePath: string,
+  entryName: string
+): Promise<string> {
+  let tempExtractPathOfXml: string;
+
+  switch (archiveType) {
+    case "zip":
+      tempExtractPathOfXml = await extractZipEntryToTemp(
+        archivePath,
+        entryName
+      );
+      break;
+    case "rar":
+      tempExtractPathOfXml = await extractRarEntryToTemp(
+        archivePath,
+        entryName
+      );
+      break;
+    case "7z":
+      tempExtractPathOfXml = await extract7zEntryToTemp(archivePath, entryName);
+      break;
+    default:
+      throw new Error(`Unsupported archive type: ${archiveType}`);
+  }
+
+  // Read the extracted XML file
+  const xmlDataRaw = await fs.promises.readFile(tempExtractPathOfXml, "utf-8");
+
+  // Clean up the temporary file
+  await fs.promises.unlink(tempExtractPathOfXml);
+
+  return xmlDataRaw;
+}
+
+/**
+ * Converts the raw ComicInfo XML data to a ComicInfo object and updates the metadata.
+ * @param metadata - The metadata object to update.
+ * @param comicInfoXmlFile - The name of the ComicInfo XML file in the archive.
+ * @returns {Promise<MetadataCompiled>} - The updated metadata object.
  */
 export async function compileComicInfoXmlDataIntoMetadata(
   metadata: MetadataCompiled,
   comicInfoXmlFile: string
 ): Promise<MetadataCompiled> {
-  if (metadata.archiveType == "zip") {
-    // Extract the XML file from the ZIP archive to the raw XML variable
-    metadata.comicInfoXmlFile = await getZipEntryRawContent(
-      metadata.archivePath,
-      comicInfoXmlFile
-    );
-  } else if (metadata.archiveType == "rar") {
-    // Extract the XML file from the RAR archive to the raw XML variable
-    metadata.comicInfoXmlFile = await getRarEntryRawContent(
-      metadata.archivePath,
-      comicInfoXmlFile
-    );
-  } else if (metadata.archiveType == "7z") {
-    // Extract the XML file from the 7z archive to the raw XML variable
-    metadata.comicInfoXmlFile = await get7zEntryRawContent(
-      metadata.archivePath,
-      comicInfoXmlFile
-    );
-  }
+  // Extract the raw XML content
+  metadata.comicInfoXmlFile = await getEntryRawContent(
+    metadata.archiveType,
+    metadata.archivePath,
+    comicInfoXmlFile
+  );
 
-  // parse the xml data and assert its shape for conversion
+  // Parse the XML data
   const parsedXmlData = parseXml(metadata.comicInfoXmlFile || "") as Record<
     string,
     unknown
   >;
 
-  // Convert the parsed XML data to a ComicInfo object and set it in the metadata
+  // Convert the parsed XML data to a ComicInfo object
   metadata.comicInfoXml = convertParsedXmlToComicInfo(parsedXmlData);
 
   return metadata;
 }
 
 /**
- * Converts the raw ComicInfo XML data to a ComicInfo object.
- * @param metadata
- * @param coMetXmlFile
- * @returns Promise<MetadataCompiled>
+ * Converts the raw CoMet XML data to a CoMet object and updates the metadata.
+ * @param metadata - The metadata object to update.
+ * @param coMetXmlFile - The name of the CoMet XML file in the archive.
+ * @returns {Promise<MetadataCompiled>} - The updated metadata object.
  */
 export async function compileCoMetDataIntoMetadata(
   metadata: MetadataCompiled,
   coMetXmlFile: string
 ): Promise<MetadataCompiled> {
-  if (metadata.archiveType == "zip") {
-    // Extract the XML file from the ZIP archive to the raw XML variable
-    metadata.coMetXmlFile = await getZipEntryRawContent(
-      metadata.archivePath,
-      coMetXmlFile
-    );
-  } else if (metadata.archiveType == "rar") {
-    // Extract the XML file from the RAR archive to the raw XML variable
-    metadata.coMetXmlFile = await getRarEntryRawContent(
-      metadata.archivePath,
-      coMetXmlFile
-    );
-  } else if (metadata.archiveType == "7z") {
-    metadata.coMetXmlFile = await get7zEntryRawContent(
-      metadata.archivePath,
-      coMetXmlFile
-    );
-  }
+  // Extract the raw XML content
+  metadata.coMetXmlFile = await getEntryRawContent(
+    metadata.archiveType,
+    metadata.archivePath,
+    coMetXmlFile
+  );
 
-  // parse the xml data and assert its shape for conversion
+  // Parse the XML data
   const parsedXmlData = parseXml(metadata.coMetXmlFile || "") as Record<
     string,
     unknown
   >;
 
-  // Convert the parsed XML data to a ComicInfo object and set it in the metadata
+  // Convert the parsed XML data to a CoMet object
   metadata.coMet = convertParsedXmlToCoMet(parsedXmlData);
 
   return metadata;
-}
-
-/**
- * Extracts the XML content from a ZIP archive, specifically a passed entry in the archive.
- * @param archivePath
- * @param zipEntryName
- * @returns {Promise<string>} - The raw XML content as a string.
- */
-export async function getZipEntryRawContent(
-  archivePath: string,
-  zipEntryName: string
-): Promise<string> {
-  // Extract the XML file from the ZIP archive to a temporary location
-  const tempExtractPathOfXml = await extractZipEntryToTemp(
-    archivePath,
-    zipEntryName
-  );
-
-  // Read the extracted XML file
-  const xmlDataRaw = await fs.promises.readFile(tempExtractPathOfXml, "utf-8");
-
-  // Clean up the temporary file
-  await fs.promises.unlink(tempExtractPathOfXml);
-
-  // Return the raw XML data as a string
-  return xmlDataRaw;
-}
-
-/**
- *
- */
-export async function getRarEntryRawContent(
-  archivePath: string,
-  rarEntryName: string
-): Promise<string> {
-  // Extract the XML file from the RAR archive to a temporary location
-  const tempExtractPathOfXml = await extractRarEntryToTemp(
-    archivePath,
-    rarEntryName
-  );
-
-  // Read the extracted XML file
-  const xmlDataRaw = await fs.promises.readFile(tempExtractPathOfXml, "utf-8");
-
-  // Clean up the temporary file
-  await fs.promises.unlink(tempExtractPathOfXml);
-
-  // Return the raw XML data as a string
-  return xmlDataRaw;
-}
-
-async function get7zEntryRawContent(
-  archivePath: string,
-  zipEntryName: string
-): Promise<string> {
-  // Extract the XML file from the ZIP archive to a temporary location
-  const tempExtractPathOfXml = await extract7zEntryToTemp(
-    archivePath,
-    zipEntryName
-  );
-
-  // Read the extracted XML file
-  const xmlDataRaw = await fs.promises.readFile(tempExtractPathOfXml, "utf-8");
-
-  // Clean up the temporary file
-  await fs.promises.unlink(tempExtractPathOfXml);
-
-  // Return the raw XML data as a string
-  return xmlDataRaw;
 }

@@ -20,111 +20,88 @@ import {
 import { compile7zArchiveXmlMetadata } from "./metadata-sub-services/metadata-7z-compile-service";
 
 /**
- * Main Service function to get metadata from a comic archive.
- * @param filePath
+ * Processes metadata for a given archive type, compiling XML and comment metadata as needed with the provided functions.
+ * @param metadata - The metadata object to process.
+ * @param compileXmlMetadata - Function to compile XML metadata.
+ * @param compileCommentMetadata - Optional function to compile comment metadata.
+ * @returns {Promise<MetadataCompiled>} - The updated metadata object.
+ */
+async function processMetadata(
+  metadata: MetadataCompiled,
+  compileXmlMetadata: (metadata: MetadataCompiled) => Promise<MetadataCompiled>,
+  compileCommentMetadata?: (
+    metadata: MetadataCompiled
+  ) => Promise<MetadataCompiled>
+): Promise<MetadataCompiled> {
+  if (metadata.xmlFilePresent) {
+    metadata = await compileXmlMetadata(metadata);
+  }
+
+  if (metadata.zipCommentPresent && compileCommentMetadata) {
+    metadata = await compileCommentMetadata(metadata);
+  }
+
+  return metadata;
+}
+
+/**
+ * Service to read and compile metadata from the comic archive file for both XML and comment formats.
+ * @param filePath - The path to the comic archive file.
  * @returns {Promise<MetadataCompiled>} - A promise that resolves to the compiled metadata object.
- * @throws {Error} - Throws an error if the file does not exist or if the archive type is unsupported.
+ * @throws {Error} - Throws an error if the archive type is unsupported or if the file does not exist.
  */
 export async function getComicFileMetadata(
   filePath: string
 ): Promise<MetadataCompiled> {
+  // Ensure the file exists
   if (!fs.existsSync(filePath)) {
-    throw new Error("File does not exist: " + filePath);
+    throw new Error(`File does not exist: ${filePath}`);
   }
 
+  // Determine the archive type
   const archiveType = getArchiveType(filePath);
+  const supportedArchiveTypes = new Set(["zip", "rar", "7z"]);
 
-  if (archiveType === "unknown") {
+  if (!supportedArchiveTypes.has(archiveType)) {
     throw new Error("Unsupported archive type");
   }
 
+  // Initialize the metadata object
+  const metadata: MetadataCompiled = {
+    archiveType,
+    archivePath: filePath,
+    xmlFilePresent: false,
+    zipCommentPresent: false,
+    comicInfoXmlFile: "",
+    coMetXmlFile: "",
+    comicbookinfoComment: "",
+  };
+
+  // Process metadata based on archive type
   switch (archiveType) {
-    case "zip": {
-      let compiledMetadataObjZip: MetadataCompiled = {
-        archiveType: archiveType,
-        archivePath: filePath,
-        xmlFilePresent: await doesZipContainXml(filePath),
-        zipCommentPresent: (await getZipComment(filePath)) !== "",
-        comicInfoXmlFile: "",
-        coMetXmlFile: "",
-        comicbookinfoComment: "",
-      };
+    case "zip":
+      metadata.xmlFilePresent = await doesZipContainXml(filePath);
+      metadata.zipCommentPresent = (await getZipComment(filePath)) !== "";
+      return processMetadata(
+        metadata,
+        compileZipArchiveXmlMetadata,
+        compileZipCommentMetadata
+      );
 
-      if (compiledMetadataObjZip.xmlFilePresent) {
-        compiledMetadataObjZip = await compileZipArchiveXmlMetadata(
-          compiledMetadataObjZip
-        );
-      }
+    case "rar":
+      metadata.xmlFilePresent = await doesRarContainXml(filePath);
+      metadata.zipCommentPresent = (await getRarComment(filePath)) !== "";
+      return processMetadata(
+        metadata,
+        compileRarArchiveXmlMetadata,
+        compileRarCommentMetadata
+      );
 
-      if (compiledMetadataObjZip.zipCommentPresent) {
-        compiledMetadataObjZip = await compileZipCommentMetadata(
-          compiledMetadataObjZip
-        );
-      }
+    case "7z":
+      metadata.xmlFilePresent = await does7zContainXml(filePath);
+      return processMetadata(metadata, compile7zArchiveXmlMetadata);
 
-      return Promise.resolve(compiledMetadataObjZip);
-    }
-    case "rar": {
-      let compiledMetadataObjRar: MetadataCompiled = {
-        archiveType: archiveType,
-        archivePath: filePath,
-        xmlFilePresent: await doesRarContainXml(filePath),
-        zipCommentPresent: (await getRarComment(filePath)) !== "",
-        comicInfoXmlFile: "",
-        comicInfoJsonFile: "",
-        coMetXmlFile: "",
-        comicbookinfoComment: "",
-      };
-
-      if (compiledMetadataObjRar.xmlFilePresent) {
-        compiledMetadataObjRar = await compileRarArchiveXmlMetadata(
-          compiledMetadataObjRar
-        );
-      }
-
-      if (compiledMetadataObjRar.zipCommentPresent) {
-        compiledMetadataObjRar = await compileRarCommentMetadata(
-          compiledMetadataObjRar
-        );
-      }
-
-      return Promise.resolve(compiledMetadataObjRar);
-    }
-    case "7z": {
-      let compiledMetadataObj7z: MetadataCompiled = {
-        archiveType: archiveType,
-        archivePath: filePath,
-        xmlFilePresent: await does7zContainXml(filePath),
-        zipCommentPresent: false,
-        comicInfoXmlFile: "",
-        comicInfoJsonFile: "",
-        coMetXmlFile: "",
-        comicbookinfoComment: "",
-      };
-
-      if (compiledMetadataObj7z.xmlFilePresent) {
-        compiledMetadataObj7z = await compile7zArchiveXmlMetadata(
-          compiledMetadataObj7z
-        );
-      }
-
-      // 7z does not have a comment feature like ZIP or RAR
-
-      return Promise.resolve(compiledMetadataObj7z);
-    }
-    default: {
-      const compiledMetadataObj: MetadataCompiled = {
-        archiveType: archiveType,
-        archivePath: filePath,
-        xmlFilePresent: false,
-        zipCommentPresent: false,
-        comicInfoXmlFile: "",
-        comicInfoJsonFile: "",
-        coMetXmlFile: "",
-        comicbookinfoComment: "",
-      };
-
-      return Promise.resolve(compiledMetadataObj);
-    }
+    default:
+      throw new Error("Unexpected archive type");
   }
 }

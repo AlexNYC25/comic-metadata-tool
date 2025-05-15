@@ -2,7 +2,7 @@ import { MetadataCompiled } from "../../interfaces/metadata-compiled";
 
 import { getZipContentList, getZipComment } from "../../utils/zip-utils";
 
-import { convertParsedArchiveCommentToComicbookinfo } from "./metadata-zip-compile-service-conversions";
+import { convertParsedArchiveCommentToComicbookinfo } from "./metadata-compile-service-conversions";
 
 import {
   compileComicInfoXmlDataIntoMetadata,
@@ -10,43 +10,45 @@ import {
 } from "./metadata-compile-service";
 
 /**
+ * Finds a specific XML file in the list of files.
+ * @param files - List of files in the archive.
+ * @param fileName - The name of the file to find.
+ * @returns {string | undefined} - The file path if found, otherwise undefined.
+ */
+function findXmlFile(files: string[], fileName: string): string | undefined {
+  return files.find((file) => file.endsWith(fileName));
+}
+
+/**
  * Compiles the XML metadata from a ZIP archive.
- * @param {MetadataCompiled} metadata - The metadata object containing archive information.
+ * @param metadata - The metadata object containing archive information.
  * @returns {Promise<MetadataCompiled>} - The updated metadata object with XML data.
  */
 export async function compileZipArchiveXmlMetadata(
   metadata: MetadataCompiled
 ): Promise<MetadataCompiled> {
-  const archiveType: string = metadata.archiveType;
+  // Get the list of files in the ZIP archive
+  const xmlFilesInZip: string[] = await getZipContentList(metadata.archivePath);
 
-  // Check if the archive type is ZIP, as a safety measure
-  if (archiveType === "zip") {
-    // Get the list of files in the ZIP archive
-    const xmlFilesInZip: string[] = await getZipContentList(
-      metadata.archivePath
+  if (xmlFilesInZip.length === 0 || !metadata.xmlFilePresent) {
+    return metadata; // No XML files to process
+  }
+
+  // Find specific XML files
+  const comicInfoXmlFile = findXmlFile(xmlFilesInZip, "ComicInfo.xml");
+  const coMetXmlFile = findXmlFile(xmlFilesInZip, "CoMet.xml");
+
+  // Compile metadata from ComicInfo.xml if it exists
+  if (comicInfoXmlFile) {
+    metadata = await compileComicInfoXmlDataIntoMetadata(
+      metadata,
+      comicInfoXmlFile
     );
+  }
 
-    // Check if there are files in the ZIP archive and if XML metadata is present
-    if (xmlFilesInZip.length > 0 && metadata.xmlFilePresent) {
-      // Check if the archive contains ComicInfo.xml or CoMet.xml
-      const comicInfoXmlFile = xmlFilesInZip.find((file: string) =>
-        file.endsWith("ComicInfo.xml")
-      );
-      const coMetXmlFile = xmlFilesInZip.find((file: string) =>
-        file.endsWith("CoMet.xml")
-      );
-
-      if (comicInfoXmlFile) {
-        metadata = await compileComicInfoXmlDataIntoMetadata(
-          metadata,
-          comicInfoXmlFile
-        );
-      }
-
-      if (coMetXmlFile) {
-        metadata = await compileCoMetDataIntoMetadata(metadata, coMetXmlFile);
-      }
-    }
+  // Compile metadata from CoMet.xml if it exists
+  if (coMetXmlFile) {
+    metadata = await compileCoMetDataIntoMetadata(metadata, coMetXmlFile);
   }
 
   return metadata;
@@ -54,21 +56,27 @@ export async function compileZipArchiveXmlMetadata(
 
 /**
  * Compiles the ZIP comment metadata from a ZIP archive.
- * @param {MetadataCompiled} metadata - The metadata object containing archive information.
+ * @param metadata - The metadata object containing archive information.
  * @returns {Promise<MetadataCompiled>} - The updated metadata object with ZIP comment data.
  */
 export async function compileZipCommentMetadata(
   metadata: MetadataCompiled
 ): Promise<MetadataCompiled> {
-  const archiveType: string = metadata.archiveType;
-  if (archiveType === "zip" && metadata.zipCommentPresent) {
+  if (!metadata.zipCommentPresent) {
+    return metadata; // No ZIP comment to process
+  }
+
+  try {
+    // Get the ZIP comment
     const zipComment = await getZipComment(metadata.archivePath);
     metadata.comicbookinfoComment = zipComment;
 
-    // parse the zip comment data
+    // Parse the ZIP comment data
     const parsedZipCommentData = JSON.parse(zipComment);
     metadata.comicbookinfo =
       convertParsedArchiveCommentToComicbookinfo(parsedZipCommentData);
+  } catch (error) {
+    console.error("Failed to parse ZIP comment:", error);
   }
 
   return metadata;

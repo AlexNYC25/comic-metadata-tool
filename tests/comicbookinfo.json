@@ -1,0 +1,77 @@
+{
+    "appID": "ComicTagger/1.0.0",
+    "lastModified": "2025-05-02 01:42:16.021750",
+    "ComicBookInfo/1.0": {
+        "series": "Batman",
+        "title": "Knife Trick",
+        "issue": "1",
+        "publisher": "DC Comics",
+        "publicationMonth": 11,
+        "publicationYear": 2011,
+        "numberOfIssues": 57,
+        "comments": "Be here for the start of a new era for The Dark Knight from writer Scott Snyder (AMERICAN VAMPIRE, BATMAN: GATES OF GOTHAM) and artist Greg Capullo (Spawn)! A series of brutal killings hints at an ancient conspiracy, and Batman learns that Gotham City is deadlier than he knew.",
+        "credits": [
+            {
+                "person": "Scott Snyder",
+                "role": "Writer",
+                "primary": false
+            },
+            {
+                "person": "Greg Capullo",
+                "role": "Penciller",
+                "primary": false
+            },
+            {
+                "person": "Jonathan Glapion",
+                "role": "Inker",
+                "primary": false
+            },
+            {
+                "person": "FCO Plascencia",
+                "role": "Colorist",
+                "primary": false
+            },
+            {
+                "person": "Jimmy Betancourt",
+                "role": "Letterer",
+                "primary": false
+            },
+            {
+                "person": "Ethan Van Sciver",
+                "role": "Cover",
+                "primary": false
+            },
+            {
+                "person": "FCO Plascencia",
+                "role": "Cover",
+                "primary": false
+            },
+            {
+                "person": "Greg Capullo",
+                "role": "Cover",
+                "primary": false
+            },
+            {
+                "person": "Janelle Asselin (Siegel)",
+                "role": "Editor",
+                "primary": false
+            },
+            {
+                "person": "Katie Kubert",
+                "role": "Editor",
+                "primary": false
+            },
+            {
+                "person": "Mike Marts",
+                "role": "Editor",
+                "primary": false
+            },
+            {
+                "person": "Greg Capullo",
+                "role": "Penciler",
+                "primary": false
+            }
+        ],
+        "tags": []
+    }
+}

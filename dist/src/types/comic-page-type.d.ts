@@ -1,0 +1,2 @@
+export type ComicPageType = "FrontCover" | "InnerCover" | "Roundup" | "Story" | "Advertisement" | "Editorial" | "Letters" | "Preview" | "BackCover" | "Other" | "Deleted";
+//# sourceMappingURL=comic-page-type.d.ts.map

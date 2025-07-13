@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.3] - 2025-07-13
+
+### Added
+
+- .d.ts files in dist, for better typescript support when using published package on npm
+
+### Changed
+
+- Updated the tsconfig.json to export .d.ts files generated during building
 
 ## [1.0.2] - 2025-06-07
 

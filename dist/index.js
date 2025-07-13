@@ -29,7 +29,7 @@ const metadata_service_1 = require("./src/services/metadata-service");
  * const metadata = await readComicFileMetadata('/path/to/Batman 001 (2016).cbz');
  * console.log(metadata);
  */
-function readComicFileMetadata(filePath) {
+function readComicFileMetadata(filePath, options) {
     return __awaiter(this, void 0, void 0, function* () {
         const properFilePath = path_1.default.resolve(filePath);
         const returnObj = yield (0, metadata_service_1.getComicFileMetadata)(properFilePath);

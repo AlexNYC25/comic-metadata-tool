@@ -1,6 +1,6 @@
 {
   "name": "comic-metadata-tool",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Tool to read/write metadata from comic book files",
   "main": "dist/index.js",
   "files": [

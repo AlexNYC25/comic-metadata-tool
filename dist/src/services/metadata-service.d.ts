@@ -5,5 +5,9 @@ import { MetadataCompiled } from "../interfaces/metadata-compiled";
  * @returns {Promise<MetadataCompiled>} - A promise that resolves to the compiled metadata object.
  * @throws {Error} - Throws an error if the archive type is unsupported or if the file does not exist.
  */
-export declare function getComicFileMetadata(filePath: string): Promise<MetadataCompiled>;
+export declare function getComicFileMetadata(filePath: string, options?: {
+    parseComicInfoXml?: boolean;
+    parseComicBookInfo?: boolean;
+    parseCoMet?: boolean;
+}): Promise<MetadataCompiled>;
 //# sourceMappingURL=metadata-service.d.ts.map

@@ -4,5 +4,8 @@ import { MetadataCompiled } from "../../interfaces/metadata-compiled";
  * @param metadata - The metadata object to update.
  * @returns {Promise<MetadataCompiled>} - The updated metadata object.
  */
-export declare function compile7zArchiveXmlMetadata(metadata: MetadataCompiled): Promise<MetadataCompiled>;
+export declare function compile7zArchiveXmlMetadata(metadata: MetadataCompiled, { parseComicInfoXml, parseCoMet, }: {
+    parseComicInfoXml?: boolean;
+    parseCoMet?: boolean;
+}): Promise<MetadataCompiled>;
 //# sourceMappingURL=metadata-7z-compile-service.d.ts.map

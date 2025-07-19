@@ -10,7 +10,9 @@ const sevenZipFilePath =
   "./tests/Batman 001 (2011) (7 covers) (digital) (Minutemen-PhD).cb7";
 
 test("getComicFileMetadata - zip", async () => {
-  const metadata = await getComicFileMetadata(zipFilePath);
+  const metadata = await getComicFileMetadata(zipFilePath, {
+    parseComicInfoXml: true,
+  });
 
   expect(metadata).toBeDefined();
   expect(metadata.archiveType).toBe("zip");

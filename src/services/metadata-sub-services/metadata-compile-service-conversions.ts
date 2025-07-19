@@ -1,4 +1,5 @@
 import { ComicInfo } from "../../interfaces/comicInfo";
+import { ComicInfoRawXML } from "../../interfaces/comicInfoXml";
 import { ComicPageInfo } from "../../interfaces/metadata-parts/comic-page-info";
 import { CoMet } from "../../interfaces/comet";
 import { ComicBookInfo } from "../../interfaces/comicbookinfo";
@@ -31,10 +32,11 @@ function parseNumber(value?: string | number): number | undefined {
 export function convertParsedXmlToComicInfo(
   parsedXmlData: Record<string, unknown>
 ): ComicInfo {
-  const comicInfoData = (parsedXmlData.ComicInfo as Partial<ComicInfo>) || {};
+  const comicInfoData =
+    (parsedXmlData.ComicInfo as Partial<ComicInfoRawXML>) || {};
 
   // Normalize pages
-  const pagesRaw = (comicInfoData.pages as { Page?: unknown } | undefined)
+  const pagesRaw = (comicInfoData.Pages as { Page?: unknown } | undefined)
     ?.Page;
   const pages: ComicPageInfo[] = ensureArray(pagesRaw).map((value) => {
     const page = value as Record<string, unknown>; // Explicitly cast to the expected type
@@ -49,46 +51,46 @@ export function convertParsedXmlToComicInfo(
   });
 
   return {
-    title: comicInfoData.title,
-    series: comicInfoData.series,
-    number: comicInfoData.number?.toString(),
-    count: comicInfoData.count,
-    volume: comicInfoData.volume,
-    alternateSeries: comicInfoData.alternateSeries,
-    alternateNumber: comicInfoData.alternateNumber,
-    alternateCount: comicInfoData.alternateCount,
-    summary: comicInfoData.summary,
-    notes: comicInfoData.notes,
-    year: comicInfoData.year,
-    month: comicInfoData.month,
-    day: comicInfoData.day,
-    writer: comicInfoData.writer,
-    penciller: comicInfoData.penciller,
-    inker: comicInfoData.inker,
-    colorist: comicInfoData.colorist,
-    letterer: comicInfoData.letterer,
-    coverArtist: comicInfoData.coverArtist,
-    editor: comicInfoData.editor,
-    publisher: comicInfoData.publisher,
-    imprint: comicInfoData.imprint,
-    genre: comicInfoData.genre,
-    web: comicInfoData.web,
-    pageCount: comicInfoData.pageCount,
-    languageISO: comicInfoData.languageISO,
-    format: comicInfoData.format,
-    blackAndWhite: comicInfoData.blackAndWhite,
-    manga: comicInfoData.manga,
-    characters: comicInfoData.characters,
-    teams: comicInfoData.teams,
-    locations: comicInfoData.locations,
-    scanInformation: comicInfoData.scanInformation,
-    storyArc: comicInfoData.storyArc,
-    seriesGroup: comicInfoData.seriesGroup,
-    ageRating: comicInfoData.ageRating,
+    title: comicInfoData.Title,
+    series: comicInfoData.Series,
+    number: comicInfoData.Number?.toString(),
+    count: comicInfoData.Count,
+    volume: comicInfoData.Volume,
+    alternateSeries: comicInfoData.AlternateSeries,
+    alternateNumber: comicInfoData.AlternateNumber,
+    alternateCount: comicInfoData.AlternateCount,
+    summary: comicInfoData.Summary,
+    notes: comicInfoData.Notes,
+    year: comicInfoData.Year,
+    month: comicInfoData.Month,
+    day: comicInfoData.Day,
+    writer: comicInfoData.Writer,
+    penciller: comicInfoData.Penciller,
+    inker: comicInfoData.Inker,
+    colorist: comicInfoData.Colorist,
+    letterer: comicInfoData.Letterer,
+    coverArtist: comicInfoData.CoverArtist,
+    editor: comicInfoData.Editor,
+    publisher: comicInfoData.Publisher,
+    imprint: comicInfoData.Imprint,
+    genre: comicInfoData.Genre,
+    web: comicInfoData.Web,
+    pageCount: comicInfoData.PageCount,
+    languageISO: comicInfoData.LanguageISO,
+    format: comicInfoData.Format,
+    blackAndWhite: comicInfoData.BlackAndWhite,
+    manga: comicInfoData.Manga,
+    characters: comicInfoData.Characters,
+    teams: comicInfoData.Teams,
+    locations: comicInfoData.Locations,
+    scanInformation: comicInfoData.ScanInformation,
+    storyArc: comicInfoData.StoryArc,
+    seriesGroup: comicInfoData.SeriesGroup,
+    ageRating: comicInfoData.AgeRating,
     pages: pages,
-    communityRating: comicInfoData.communityRating,
-    mainCharacterOrTeam: comicInfoData.mainCharacterOrTeam,
-    review: comicInfoData.review,
+    communityRating: comicInfoData.CommunityRating,
+    mainCharacterOrTeam: comicInfoData.MainCharacterOrTeam,
+    review: comicInfoData.Review,
   };
 }
 

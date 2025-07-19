@@ -22,23 +22,41 @@ import { compile7zArchiveXmlMetadata } from "./metadata-sub-services/metadata-7z
 /**
  * Processes metadata for a given archive type, compiling XML and comment metadata as needed with the provided functions.
  * @param metadata - The metadata object to process.
+ * @param options - Options for parsing different metadata formats.
  * @param compileXmlMetadata - Function to compile XML metadata.
  * @param compileCommentMetadata - Optional function to compile comment metadata.
  * @returns {Promise<MetadataCompiled>} - The updated metadata object.
  */
 async function processMetadata(
   metadata: MetadataCompiled,
-  compileXmlMetadata: (metadata: MetadataCompiled) => Promise<MetadataCompiled>,
+  options: {
+    parseComicInfoXml?: boolean;
+    parseComicBookInfo?: boolean;
+    parseCoMet?: boolean;
+  },
+  compileXmlMetadata: (
+    metadata: MetadataCompiled,
+    options: {
+      parseComicInfoXml?: boolean;
+      parseComicBookInfo?: boolean;
+      parseCoMet?: boolean;
+    }
+  ) => Promise<MetadataCompiled>,
   compileCommentMetadata?: (
-    metadata: MetadataCompiled
+    metadata: MetadataCompiled,
+    options: {
+      parseComicInfoXml?: boolean;
+      parseComicBookInfo?: boolean;
+      parseCoMet?: boolean;
+    }
   ) => Promise<MetadataCompiled>
 ): Promise<MetadataCompiled> {
   if (metadata.xmlFilePresent) {
-    metadata = await compileXmlMetadata(metadata);
+    metadata = await compileXmlMetadata(metadata, options);
   }
 
   if (metadata.zipCommentPresent && compileCommentMetadata) {
-    metadata = await compileCommentMetadata(metadata);
+    metadata = await compileCommentMetadata(metadata, options);
   }
 
   return metadata;
@@ -51,7 +69,12 @@ async function processMetadata(
  * @throws {Error} - Throws an error if the archive type is unsupported or if the file does not exist.
  */
 export async function getComicFileMetadata(
-  filePath: string
+  filePath: string,
+  options?: {
+    parseComicInfoXml?: boolean;
+    parseComicBookInfo?: boolean;
+    parseCoMet?: boolean;
+  }
 ): Promise<MetadataCompiled> {
   // Ensure the file exists
   if (!fs.existsSync(filePath)) {
@@ -84,6 +107,7 @@ export async function getComicFileMetadata(
       metadata.zipCommentPresent = (await getZipComment(filePath)) !== "";
       return processMetadata(
         metadata,
+        options || {},
         compileZipArchiveXmlMetadata,
         compileZipCommentMetadata
       );
@@ -93,13 +117,17 @@ export async function getComicFileMetadata(
       metadata.zipCommentPresent = (await getRarComment(filePath)) !== "";
       return processMetadata(
         metadata,
+        options || {},
         compileRarArchiveXmlMetadata,
         compileRarCommentMetadata
       );
-
     case "7z":
       metadata.xmlFilePresent = await does7zContainXml(filePath);
-      return processMetadata(metadata, compile7zArchiveXmlMetadata);
+      return processMetadata(
+        metadata,
+        options || {},
+        compile7zArchiveXmlMetadata
+      );
 
     default:
       throw new Error("Unexpected archive type");

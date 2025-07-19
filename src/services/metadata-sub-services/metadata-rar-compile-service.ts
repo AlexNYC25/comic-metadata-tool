@@ -25,7 +25,14 @@ function findXmlFile(files: string[], fileName: string): string | undefined {
  * @returns {Promise<MetadataCompiled>} - The updated metadata object with XML data.
  */
 export async function compileRarArchiveXmlMetadata(
-  metadata: MetadataCompiled
+  metadata: MetadataCompiled,
+  {
+    parseComicInfoXml = true,
+    parseCoMet = true,
+  }: {
+    parseComicInfoXml?: boolean;
+    parseCoMet?: boolean;
+  }
 ): Promise<MetadataCompiled> {
   // Get the list of XML files in the RAR archive
   const xmlFilesInRar: string[] = await getRarContentList(metadata.archivePath);
@@ -39,7 +46,7 @@ export async function compileRarArchiveXmlMetadata(
   const coMetXmlFile = findXmlFile(xmlFilesInRar, "CoMet.xml");
 
   // Compile metadata from ComicInfo.xml if it exists
-  if (comicInfoXmlFile) {
+  if (comicInfoXmlFile && parseComicInfoXml) {
     metadata = await compileComicInfoXmlDataIntoMetadata(
       metadata,
       comicInfoXmlFile
@@ -47,7 +54,7 @@ export async function compileRarArchiveXmlMetadata(
   }
 
   // Compile metadata from CoMet.xml if it exists
-  if (coMetXmlFile) {
+  if (coMetXmlFile && parseCoMet) {
     metadata = await compileCoMetDataIntoMetadata(metadata, coMetXmlFile);
   }
 
@@ -60,9 +67,14 @@ export async function compileRarArchiveXmlMetadata(
  * @returns {Promise<MetadataCompiled>} - The updated metadata object with ZIP comment data.
  */
 export async function compileRarCommentMetadata(
-  metadata: MetadataCompiled
+  metadata: MetadataCompiled,
+  {
+    parseComicBookInfo = true,
+  }: {
+    parseComicBookInfo?: boolean;
+  }
 ): Promise<MetadataCompiled> {
-  if (!metadata.zipCommentPresent) {
+  if (!metadata.zipCommentPresent || !parseComicBookInfo) {
     return metadata; // No ZIP comment to process
   }
 

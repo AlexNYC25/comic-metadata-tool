@@ -21,7 +21,14 @@ function findXmlFile(files: string[], fileName: string): string | undefined {
  * @returns {Promise<MetadataCompiled>} - The updated metadata object.
  */
 export async function compile7zArchiveXmlMetadata(
-  metadata: MetadataCompiled
+  metadata: MetadataCompiled,
+  {
+    parseComicInfoXml = true,
+    parseCoMet = true,
+  }: {
+    parseComicInfoXml?: boolean;
+    parseCoMet?: boolean;
+  }
 ): Promise<MetadataCompiled> {
   // Get the list of XML files in the 7z archive
   const xmlFilesIn7z: string[] = await get7zContentList(metadata.archivePath);
@@ -35,7 +42,7 @@ export async function compile7zArchiveXmlMetadata(
   const coMetXmlFile = findXmlFile(xmlFilesIn7z, "CoMet.xml");
 
   // Compile metadata from ComicInfo.xml if it exists
-  if (comicInfoXmlFile) {
+  if (comicInfoXmlFile && parseComicInfoXml) {
     metadata = await compileComicInfoXmlDataIntoMetadata(
       metadata,
       comicInfoXmlFile
@@ -43,7 +50,7 @@ export async function compile7zArchiveXmlMetadata(
   }
 
   // Compile metadata from CoMet.xml if it exists
-  if (coMetXmlFile) {
+  if (coMetXmlFile && parseCoMet) {
     metadata = await compileCoMetDataIntoMetadata(metadata, coMetXmlFile);
   }
 

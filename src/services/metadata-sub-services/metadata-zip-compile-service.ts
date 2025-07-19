@@ -19,35 +19,30 @@ function findXmlFile(files: string[], fileName: string): string | undefined {
   return files.find((file) => file.endsWith(fileName));
 }
 
-/**
- * Compiles the XML metadata from a ZIP archive.
- * @param metadata - The metadata object containing archive information.
- * @returns {Promise<MetadataCompiled>} - The updated metadata object with XML data.
- */
 export async function compileZipArchiveXmlMetadata(
-  metadata: MetadataCompiled
+  metadata: MetadataCompiled,
+  {
+    parseComicInfoXml = true,
+    parseCoMet = true,
+  }: {
+    parseComicInfoXml?: boolean;
+    parseCoMet?: boolean;
+  } = {}
 ): Promise<MetadataCompiled> {
-  // Get the list of files in the ZIP archive
-  const xmlFilesInZip: string[] = await getZipContentList(metadata.archivePath);
+  const xmlFilesInZip = await getZipContentList(metadata.archivePath);
+  if (!metadata.xmlFilePresent || xmlFilesInZip.length === 0) return metadata;
 
-  if (xmlFilesInZip.length === 0 || !metadata.xmlFilePresent) {
-    return metadata; // No XML files to process
-  }
-
-  // Find specific XML files
   const comicInfoXmlFile = findXmlFile(xmlFilesInZip, "ComicInfo.xml");
   const coMetXmlFile = findXmlFile(xmlFilesInZip, "CoMet.xml");
 
-  // Compile metadata from ComicInfo.xml if it exists
-  if (comicInfoXmlFile) {
+  if (comicInfoXmlFile && parseComicInfoXml) {
     metadata = await compileComicInfoXmlDataIntoMetadata(
       metadata,
       comicInfoXmlFile
     );
   }
 
-  // Compile metadata from CoMet.xml if it exists
-  if (coMetXmlFile) {
+  if (coMetXmlFile && parseCoMet) {
     metadata = await compileCoMetDataIntoMetadata(metadata, coMetXmlFile);
   }
 
@@ -57,12 +52,18 @@ export async function compileZipArchiveXmlMetadata(
 /**
  * Compiles the ZIP comment metadata from a ZIP archive.
  * @param metadata - The metadata object containing archive information.
+ * @param options - Options for parsing different metadata formats.
  * @returns {Promise<MetadataCompiled>} - The updated metadata object with ZIP comment data.
  */
 export async function compileZipCommentMetadata(
-  metadata: MetadataCompiled
+  metadata: MetadataCompiled,
+  {
+    parseComicBookInfo = true,
+  }: {
+    parseComicBookInfo?: boolean;
+  }
 ): Promise<MetadataCompiled> {
-  if (!metadata.zipCommentPresent) {
+  if (!metadata.zipCommentPresent || !parseComicBookInfo) {
     return metadata; // No ZIP comment to process
   }
 

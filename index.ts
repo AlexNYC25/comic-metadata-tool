@@ -17,12 +17,18 @@ import { MetadataCompiled } from "./src/interfaces/metadata-compiled";
  * console.log(metadata);
  */
 export async function readComicFileMetadata(
-  filePath: string
+  filePath: string,
+  options?: {
+    parseComicInfoXml?: boolean;
+    parseComicBookInfo?: boolean;
+    parseCoMet?: boolean;
+  }
 ): Promise<MetadataCompiled> {
   const properFilePath: string = path.resolve(filePath);
 
   const returnObj: MetadataCompiled = await getComicFileMetadata(
-    properFilePath
+    properFilePath,
+    options
   );
 
   return returnObj;

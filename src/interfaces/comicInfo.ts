@@ -4,65 +4,65 @@ import { Manga } from "../types/manga";
 import { ComicPageInfo } from "./metadata-parts/comic-page-info";
 
 export interface ComicInfo {
-  Title?: string;
-  Series?: string;
-  Number?: string;
-  Count?: number;
-  Volume?: number;
+  title?: string;
+  series?: string;
+  number?: string;
+  count?: number;
+  volume?: number;
 
-  AlternateSeries?: string;
-  AlternateNumber?: string;
-  AlternateCount?: number;
+  alternateSeries?: string;
+  alternateNumber?: string;
+  alternateCount?: number;
 
-  Summary?: string;
-  Notes?: string;
+  summary?: string;
+  notes?: string;
 
-  Year?: number;
-  Month?: number;
-
-  /** v2 only */
-  Day?: number;
-
-  Writer?: string;
-  Penciller?: string;
-  Inker?: string;
-  Colorist?: string;
-  Letterer?: string;
-  CoverArtist?: string;
-  Editor?: string;
-
-  Publisher?: string;
-  Imprint?: string;
-  Genre?: string;
-  Web?: string;
-
-  PageCount?: number;
-
-  LanguageISO?: string;
-  Format?: string;
-
-  BlackAndWhite?: YesNo;
-  Manga?: Manga;
+  year?: number;
+  month?: number;
 
   /** v2 only */
-  Characters?: string;
-  Teams?: string;
-  Locations?: string;
-  ScanInformation?: string;
-  StoryArc?: string;
-  SeriesGroup?: string;
+  day?: number;
+
+  writer?: string;
+  penciller?: string;
+  inker?: string;
+  colorist?: string;
+  letterer?: string;
+  coverArtist?: string;
+  editor?: string;
+
+  publisher?: string;
+  imprint?: string;
+  genre?: string;
+  web?: string;
+
+  pageCount?: number;
+
+  languageISO?: string;
+  format?: string;
+
+  blackAndWhite?: YesNo;
+  manga?: Manga;
 
   /** v2 only */
-  AgeRating?: AgeRating;
+  characters?: string;
+  teams?: string;
+  locations?: string;
+  scanInformation?: string;
+  storyArc?: string;
+  seriesGroup?: string;
+
+  /** v2 only */
+  ageRating?: AgeRating;
 
   /** both versions */
-  Pages?: ComicPageInfo[];
+  pages?: ComicPageInfo[];
 
   /** v2 only: 0.00–5.00 */
-  CommunityRating?: number;
+  communityRating?: number;
 
   /** v2 only */
-  MainCharacterOrTeam?: string;
+  mainCharacterOrTeam?: string;
   /** v2 only */
-  Review?: string;
+  review?: string;
 }

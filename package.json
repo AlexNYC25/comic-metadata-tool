@@ -2,8 +2,22 @@
   "name": "comic-metadata-tool",
   "version": "1.1.0",
   "description": "Tool to read/write metadata from comic book files",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "type": "module",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    }
+  },
   "files": [
     "dist",
     "README.md",
@@ -11,7 +25,11 @@
   ],
   "scripts": {
     "test": "npx vitest --silent=false",
-    "build": "tsc --outDir dist",
+    "build": "npm run clean && npm run build:esm && npm run build:cjs && npm run build:types",
+    "build:esm": "tsc -p tsconfig.esm.json && node scripts/fix-esm-imports.cjs dist/esm",
+    "build:cjs": "tsc -p tsconfig.cjs.json && echo '{\"type\":\"commonjs\"}' > dist/cjs/package.json",
+    "build:types": "tsc -p tsconfig.types.json",
+    "clean": "rm -rf dist",
     "prepare": "npm run build"
   },
   "repository": {

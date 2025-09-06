@@ -2,6 +2,43 @@
 
 A Node.js tool to read and write metadata from comic book archive files (CBZ, CBR, CB7) supporting ComicInfo.xml, CoMet, and ComicBookInfo formats.
 
+## Supported Archive Formats & Tooling
+
+This library supports multiple comic archive formats using different underlying tools:
+
+### CBZ Files (.cbz, .zip)
+- **Native Support**: Pure JavaScript implementation
+- **Library**: [`adm-zip`](https://github.com/cthackers/adm-zip) - A pure JavaScript implementation for handling ZIP archives
+- **Features**: 
+  - Read ZIP comments (for ComicBookInfo metadata)
+  - Extract XML files (ComicInfo.xml, CoMet.xml)
+  - Full archive content listing
+- **Platform**: Cross-platform, no external dependencies
+
+### CBR Files (.cbr, .rar)
+- **External Tool**: RAR decompression via WebAssembly
+- **Library**: [`node-unrar-js`](https://github.com/YuJianrong/node-unrar-js) - A JavaScript port of UnRAR using Emscripten
+- **Features**:
+  - Read RAR comments (for ComicBookInfo metadata)
+  - Extract files from RAR archives
+  - Full archive content listing
+- **Platform**: Cross-platform WebAssembly implementation, no external binaries required
+
+### CB7 Files (.cb7, .7z)
+- **External Tool**: 7-Zip binary
+- **Libraries**: 
+  - [`node-7z`](https://github.com/quentinrossetti/node-7z) - Node.js wrapper for 7-Zip
+  - [`7zip-bin`](https://github.com/develar/7zip-bin) - Provides platform-specific 7za binaries
+- **Features**:
+  - Extract XML files from 7z archives
+  - Full archive content listing
+- **Platform**: Cross-platform (includes binaries for Windows, macOS, Linux)
+- **Note**: On macOS, you may need to make the binary executable: `chmod +x node_modules/7zip-bin/mac/arm64/7za`
+
+### XML Parsing
+- **Library**: [`fast-xml-parser`](https://github.com/NaturalIntelligence/fast-xml-parser) - High-performance XML parser
+- **Features**: Parse ComicInfo.xml and CoMet.xml metadata formats
+
 ## Supported Metadata Formats
 
 - [ComicBookInfo](https://code.google.com/archive/p/comicbookinfo/wikis/Example.wiki)
@@ -14,15 +51,33 @@ A Node.js tool to read and write metadata from comic book archive files (CBZ, CB
 npm install comic-metadata-tool
 ```
 
+## TypeScript Support
+
+This package includes comprehensive TypeScript definitions and supports both ESM and CommonJS imports:
+
+```typescript
+import { 
+  readComicFileMetadata, 
+  type MetadataCompiled, 
+  type ReadComicFileMetadataOptions,
+  type ComicInfo,
+  type CoMet,
+  type ComicBookInfo 
+} from "comic-metadata-tool";
+
+// All return types are fully typed
+const metadata: MetadataCompiled = await readComicFileMetadata(filePath);
+```
+
 ## Usage
 
 ### Importing
 ```js
 // ESM
-import { getComicFileMetadata } from "comic-metadata-tool";
+import { readComicFileMetadata } from "comic-metadata-tool";
 
 // CommonJS
-const { getComicFileMetadata } = require("comic-metadata-tool");
+const { readComicFileMetadata } = require("comic-metadata-tool");
 ```
 
 ### Reading Metadata from an Archive
@@ -30,7 +85,7 @@ const { getComicFileMetadata } = require("comic-metadata-tool");
 ```js
 const filePath = "/path/to/comic.cbz"; // or .cbr, .cb7
 
-getComicFileMetadata(filePath, {
+readComicFileMetadata(filePath, {
   parseComicInfoXml: true,
   parseComicBookInfo: true,
   parseCoMet: true

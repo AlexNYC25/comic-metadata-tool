@@ -2,6 +2,30 @@ import path from "path";
 import { getComicFileMetadata } from "./src/services/metadata-service";
 import { MetadataCompiled } from "./src/interfaces/metadata-compiled";
 
+// Export types for library consumers
+export type { MetadataCompiled } from "./src/interfaces/metadata-compiled";
+export type { ComicInfo } from "./src/interfaces/comicInfo";
+export type { CoMet } from "./src/interfaces/comet";
+export type {
+  ComicBookInfo,
+  ComicBookInfoPayload,
+} from "./src/interfaces/comicbookinfo";
+export type { ComicPageInfo } from "./src/interfaces/metadata-parts/comic-page-info";
+export type { CreditEntry } from "./src/interfaces/metadata-parts/credit-entry";
+
+// Export utility types
+export type { AgeRating } from "./src/types/age-rating";
+export type { ComicPageType } from "./src/types/comic-page-type";
+export type { Manga } from "./src/types/manga";
+export type { YesNo } from "./src/types/yes-no";
+
+// Export options type for the main function
+export interface ReadComicFileMetadataOptions {
+  parseComicInfoXml?: boolean;
+  parseComicBookInfo?: boolean;
+  parseCoMet?: boolean;
+}
+
 /**
  * All in one function to read the metadata of a comic archive file, reading metadata formats supported including:
  * - ComicInfo.xml
@@ -18,11 +42,7 @@ import { MetadataCompiled } from "./src/interfaces/metadata-compiled";
  */
 export async function readComicFileMetadata(
   filePath: string,
-  options?: {
-    parseComicInfoXml?: boolean;
-    parseComicBookInfo?: boolean;
-    parseCoMet?: boolean;
-  }
+  options?: ReadComicFileMetadataOptions
 ): Promise<MetadataCompiled> {
   const properFilePath: string = path.resolve(filePath);
 

@@ -84,3 +84,29 @@ export async function getJsonFilesFrom7z(filePath: string): Promise<string[]> {
   const files = await get7zContentList(filePath);
   return files.filter((file) => file.endsWith(".json"));
 }
+
+/**
+ * Directly extracts the content of a 7z entry as a string without creating temporary files.
+ * @param archivePath - The path to the 7z archive.
+ * @param entryName - The name of the entry to extract.
+ * @returns {Promise<string>} - The content of the file as a string.
+ */
+export async function get7zEntryContent(
+  archivePath: string,
+  entryName: string
+): Promise<string> {
+  // Extract to temporary location first, then read and clean up
+  const tempPath = await extract7zEntryToTemp(archivePath, entryName);
+
+  try {
+    const content = await fsp.readFile(tempPath, "utf-8");
+    return content;
+  } finally {
+    // Clean up temporary file
+    try {
+      await fsp.unlink(tempPath);
+    } catch {
+      // Ignore cleanup errors
+    }
+  }
+}

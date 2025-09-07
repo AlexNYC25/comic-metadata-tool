@@ -1,10 +1,9 @@
-import fs from "fs";
 import { MetadataCompiled } from "../../interfaces/metadata-compiled";
 
 import { parseXml } from "../../utils/xml-utils";
-import { extractZipEntryToTemp } from "../../utils/zip-utils";
-import { extractRarEntryToTemp } from "../../utils/rar-utils";
-import { extract7zEntryToTemp } from "../../utils/7z-utils";
+import { getZipEntryContent } from "../../utils/zip-utils";
+import { getRarEntryContent } from "../../utils/rar-utils";
+import { get7zEntryContent } from "../../utils/7z-utils";
 
 import {
   convertParsedXmlToComicInfo,
@@ -24,35 +23,16 @@ async function getEntryRawContent(
   archivePath: string,
   entryName: string
 ): Promise<string> {
-  let tempExtractPathOfXml: string;
-
   switch (archiveType) {
     case "zip":
-      tempExtractPathOfXml = await extractZipEntryToTemp(
-        archivePath,
-        entryName
-      );
-      break;
+      return await getZipEntryContent(archivePath, entryName);
     case "rar":
-      tempExtractPathOfXml = await extractRarEntryToTemp(
-        archivePath,
-        entryName
-      );
-      break;
+      return await getRarEntryContent(archivePath, entryName);
     case "7z":
-      tempExtractPathOfXml = await extract7zEntryToTemp(archivePath, entryName);
-      break;
+      return await get7zEntryContent(archivePath, entryName);
     default:
       throw new Error(`Unsupported archive type: ${archiveType}`);
   }
-
-  // Read the extracted XML file
-  const xmlDataRaw = await fs.promises.readFile(tempExtractPathOfXml, "utf-8");
-
-  // Clean up the temporary file
-  await fs.promises.unlink(tempExtractPathOfXml);
-
-  return xmlDataRaw;
 }
 
 /**

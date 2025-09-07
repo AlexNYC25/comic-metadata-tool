@@ -27,7 +27,9 @@ test("getComicFileMetadata - zip", async () => {
 });
 
 test("getComicFileMetadata - rar", async () => {
-  const metadata = await getComicFileMetadata(rarFilePath);
+  const metadata = await getComicFileMetadata(rarFilePath, {
+    parseComicInfoXml: true,
+  });
 
   expect(metadata).toBeDefined();
   expect(metadata.archiveType).toBe("rar");

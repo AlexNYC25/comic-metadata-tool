@@ -9,6 +9,7 @@ exports.does7zContainXml = does7zContainXml;
 exports.does7zContainJson = does7zContainJson;
 exports.getXmlFilesFrom7z = getXmlFilesFrom7z;
 exports.getJsonFilesFrom7z = getJsonFilesFrom7z;
+exports.get7zEntryContent = get7zEntryContent;
 // zip-utils.ts
 const fs_1 = __importDefault(require("fs"));
 const os_1 = __importDefault(require("os"));
@@ -76,5 +77,28 @@ async function getXmlFilesFrom7z(filePath) {
 async function getJsonFilesFrom7z(filePath) {
     const files = await get7zContentList(filePath);
     return files.filter((file) => file.endsWith(".json"));
+}
+/**
+ * Directly extracts the content of a 7z entry as a string without creating temporary files.
+ * @param archivePath - The path to the 7z archive.
+ * @param entryName - The name of the entry to extract.
+ * @returns {Promise<string>} - The content of the file as a string.
+ */
+async function get7zEntryContent(archivePath, entryName) {
+    // Extract to temporary location first, then read and clean up
+    const tempPath = await extract7zEntryToTemp(archivePath, entryName);
+    try {
+        const content = await fsp.readFile(tempPath, "utf-8");
+        return content;
+    }
+    finally {
+        // Clean up temporary file
+        try {
+            await fsp.unlink(tempPath);
+        }
+        catch {
+            // Ignore cleanup errors
+        }
+    }
 }
 //# sourceMappingURL=7z-utils.js.map

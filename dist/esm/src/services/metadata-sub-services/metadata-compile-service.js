@@ -1,8 +1,7 @@
-import fs from "fs";
 import { parseXml } from "../../utils/xml-utils.js";
-import { extractZipEntryToTemp } from "../../utils/zip-utils.js";
-import { extractRarEntryToTemp } from "../../utils/rar-utils.js";
-import { extract7zEntryToTemp } from "../../utils/7z-utils.js";
+import { getZipEntryContent } from "../../utils/zip-utils.js";
+import { getRarEntryContent } from "../../utils/rar-utils.js";
+import { get7zEntryContent } from "../../utils/7z-utils.js";
 import { convertParsedXmlToComicInfo, convertParsedXmlToCoMet, } from "./metadata-compile-service-conversions.js";
 /**
  * Extracts raw XML content from an archive based on its type.
@@ -13,25 +12,16 @@ import { convertParsedXmlToComicInfo, convertParsedXmlToCoMet, } from "./metadat
  * @throws {Error} - Throws an error if the archive type is unsupported.
  */
 async function getEntryRawContent(archiveType, archivePath, entryName) {
-    let tempExtractPathOfXml;
     switch (archiveType) {
         case "zip":
-            tempExtractPathOfXml = await extractZipEntryToTemp(archivePath, entryName);
-            break;
+            return await getZipEntryContent(archivePath, entryName);
         case "rar":
-            tempExtractPathOfXml = await extractRarEntryToTemp(archivePath, entryName);
-            break;
+            return await getRarEntryContent(archivePath, entryName);
         case "7z":
-            tempExtractPathOfXml = await extract7zEntryToTemp(archivePath, entryName);
-            break;
+            return await get7zEntryContent(archivePath, entryName);
         default:
             throw new Error(`Unsupported archive type: ${archiveType}`);
     }
-    // Read the extracted XML file
-    const xmlDataRaw = await fs.promises.readFile(tempExtractPathOfXml, "utf-8");
-    // Clean up the temporary file
-    await fs.promises.unlink(tempExtractPathOfXml);
-    return xmlDataRaw;
 }
 /**
  * Converts the raw ComicInfo XML data to a ComicInfo object and updates the metadata.

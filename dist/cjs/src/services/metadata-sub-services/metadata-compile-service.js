@@ -1,11 +1,7 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.compileComicInfoXmlDataIntoMetadata = compileComicInfoXmlDataIntoMetadata;
 exports.compileCoMetDataIntoMetadata = compileCoMetDataIntoMetadata;
-const fs_1 = __importDefault(require("fs"));
 const xml_utils_1 = require("../../utils/xml-utils");
 const zip_utils_1 = require("../../utils/zip-utils");
 const rar_utils_1 = require("../../utils/rar-utils");
@@ -20,25 +16,16 @@ const metadata_compile_service_conversions_1 = require("./metadata-compile-servi
  * @throws {Error} - Throws an error if the archive type is unsupported.
  */
 async function getEntryRawContent(archiveType, archivePath, entryName) {
-    let tempExtractPathOfXml;
     switch (archiveType) {
         case "zip":
-            tempExtractPathOfXml = await (0, zip_utils_1.extractZipEntryToTemp)(archivePath, entryName);
-            break;
+            return await (0, zip_utils_1.getZipEntryContent)(archivePath, entryName);
         case "rar":
-            tempExtractPathOfXml = await (0, rar_utils_1.extractRarEntryToTemp)(archivePath, entryName);
-            break;
+            return await (0, rar_utils_1.getRarEntryContent)(archivePath, entryName);
         case "7z":
-            tempExtractPathOfXml = await (0, _7z_utils_1.extract7zEntryToTemp)(archivePath, entryName);
-            break;
+            return await (0, _7z_utils_1.get7zEntryContent)(archivePath, entryName);
         default:
             throw new Error(`Unsupported archive type: ${archiveType}`);
     }
-    // Read the extracted XML file
-    const xmlDataRaw = await fs_1.default.promises.readFile(tempExtractPathOfXml, "utf-8");
-    // Clean up the temporary file
-    await fs_1.default.promises.unlink(tempExtractPathOfXml);
-    return xmlDataRaw;
 }
 /**
  * Converts the raw ComicInfo XML data to a ComicInfo object and updates the metadata.

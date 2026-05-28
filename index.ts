@@ -1,11 +1,25 @@
 import path from "path";
-import { getComicFileMetadata } from "./src/services/metadata-service";
+import {
+  getComicFileMetadata,
+  writeComicFileMetadata as writeComicFileMetadataService,
+} from "./src/services/metadata-service";
 import { MetadataCompiled } from "./src/interfaces/metadata-compiled";
+import {
+  MetadataWritePayload,
+  MetadataWriteResult,
+  WriteComicFileMetadataOptions,
+} from "./src/interfaces/metadata-write";
 
 // Export types for library consumers
 export type { MetadataCompiled } from "./src/interfaces/metadata-compiled";
 export type { ComicInfo } from "./src/interfaces/comicInfo";
 export type { CoMet } from "./src/interfaces/comet";
+export type {
+  MetadataWriteFormat,
+  MetadataWritePayload,
+  MetadataWriteResult,
+  WriteComicFileMetadataOptions,
+} from "./src/interfaces/metadata-write";
 export type {
   ComicBookInfo,
   ComicBookInfoPayload,
@@ -42,14 +56,32 @@ export interface ReadComicFileMetadataOptions {
  */
 export async function readComicFileMetadata(
   filePath: string,
-  options?: ReadComicFileMetadataOptions
+  options?: ReadComicFileMetadataOptions,
 ): Promise<MetadataCompiled> {
   const properFilePath: string = path.resolve(filePath);
 
   const returnObj: MetadataCompiled = await getComicFileMetadata(
     properFilePath,
-    options
+    options,
   );
 
   return returnObj;
+}
+
+/**
+ * Writes metadata into a comic archive file. The default behavior mirrors the
+ * archive's existing metadata format and falls back to ComicInfo.xml.
+ * @param filePath - The path to the comic file as a string.
+ * @param payload - The metadata payload for one or more supported formats.
+ * @param options - Write options that control format selection.
+ * @returns {Promise<MetadataWriteResult>} - A promise that resolves to the write result.
+ */
+export async function writeComicFileMetadata(
+  filePath: string,
+  payload: MetadataWritePayload,
+  options?: WriteComicFileMetadataOptions,
+): Promise<MetadataWriteResult> {
+  const properFilePath: string = path.resolve(filePath);
+
+  return await writeComicFileMetadataService(properFilePath, payload, options);
 }

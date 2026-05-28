@@ -1,6 +1,7 @@
 import { X2jOptions } from "fast-xml-parser";
 import { CoMet } from "../interfaces/comet";
 import { ComicInfo } from "../interfaces/comicInfo";
+import { ComicBookInfo } from "../interfaces/comicbookinfo";
 /**
  * Validates and parses an XML string into a JavaScript object.
  * @param xmlContent - The XML content as a string.
@@ -21,4 +22,7 @@ export declare function parseCometXml(xml: string): CoMet;
  * @returns {ComicInfo} - The parsed `ComicInfo` object.
  */
 export declare function parseComicInfoXml(xml: string): ComicInfo;
+export declare function serializeComicInfoXml(comicInfo: ComicInfo): string;
+export declare function serializeCoMetXml(coMet: CoMet): string;
+export declare function serializeComicBookInfoComment(comicbookinfo: ComicBookInfo): string;
 //# sourceMappingURL=xml-utils.d.ts.map

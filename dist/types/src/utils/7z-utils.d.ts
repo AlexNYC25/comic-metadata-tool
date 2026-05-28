@@ -11,4 +11,5 @@ export declare function getJsonFilesFrom7z(filePath: string): Promise<string[]>;
  * @returns {Promise<string>} - The content of the file as a string.
  */
 export declare function get7zEntryContent(archivePath: string, entryName: string): Promise<string>;
+export declare function upsert7zEntryContent(archivePath: string, entryName: string, content: string): Promise<void>;
 //# sourceMappingURL=7z-utils.d.ts.map

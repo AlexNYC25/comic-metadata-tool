@@ -1,6 +1,11 @@
 import fs from "fs";
 
 import { MetadataCompiled } from "../interfaces/metadata-compiled";
+import {
+  MetadataWritePayload,
+  MetadataWriteResult,
+  WriteComicFileMetadataOptions,
+} from "../interfaces/metadata-write";
 
 import { getArchiveType } from "../utils/file-utils";
 import { getZipComment, doesZipContainXml } from "../utils/zip-utils";
@@ -18,6 +23,7 @@ import {
 } from "./metadata-sub-services/metadata-rar-compile-service";
 
 import { compile7zArchiveXmlMetadata } from "./metadata-sub-services/metadata-7z-compile-service";
+import { writeComicFileMetadataIntoArchive } from "./metadata-sub-services/metadata-write-service";
 
 /**
  * Processes metadata for a given archive type, compiling XML and comment metadata as needed with the provided functions.
@@ -40,7 +46,7 @@ async function processMetadata(
       parseComicInfoXml?: boolean;
       parseComicBookInfo?: boolean;
       parseCoMet?: boolean;
-    }
+    },
   ) => Promise<MetadataCompiled>,
   compileCommentMetadata?: (
     metadata: MetadataCompiled,
@@ -48,8 +54,8 @@ async function processMetadata(
       parseComicInfoXml?: boolean;
       parseComicBookInfo?: boolean;
       parseCoMet?: boolean;
-    }
-  ) => Promise<MetadataCompiled>
+    },
+  ) => Promise<MetadataCompiled>,
 ): Promise<MetadataCompiled> {
   if (metadata.xmlFilePresent) {
     metadata = await compileXmlMetadata(metadata, options);
@@ -74,7 +80,7 @@ export async function getComicFileMetadata(
     parseComicInfoXml?: boolean;
     parseComicBookInfo?: boolean;
     parseCoMet?: boolean;
-  }
+  },
 ): Promise<MetadataCompiled> {
   // Ensure the file exists
   if (!fs.existsSync(filePath)) {
@@ -109,7 +115,7 @@ export async function getComicFileMetadata(
         metadata,
         options || {},
         compileZipArchiveXmlMetadata,
-        compileZipCommentMetadata
+        compileZipCommentMetadata,
       );
 
     case "rar":
@@ -119,17 +125,36 @@ export async function getComicFileMetadata(
         metadata,
         options || {},
         compileRarArchiveXmlMetadata,
-        compileRarCommentMetadata
+        compileRarCommentMetadata,
       );
     case "7z":
       metadata.xmlFilePresent = await does7zContainXml(filePath);
       return processMetadata(
         metadata,
         options || {},
-        compile7zArchiveXmlMetadata
+        compile7zArchiveXmlMetadata,
       );
 
     default:
       throw new Error("Unexpected archive type");
   }
+}
+
+/**
+ * Service to write metadata back into a comic archive file.
+ * @param filePath - The path to the comic archive file.
+ * @param payload - The metadata payload to write.
+ * @param options - Write options that determine target format behavior.
+ * @returns {Promise<MetadataWriteResult>} - Information about the write operation.
+ */
+export async function writeComicFileMetadata(
+  filePath: string,
+  payload: MetadataWritePayload,
+  options?: WriteComicFileMetadataOptions,
+): Promise<MetadataWriteResult> {
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`File does not exist: ${filePath}`);
+  }
+
+  return await writeComicFileMetadataIntoArchive(filePath, payload, options);
 }

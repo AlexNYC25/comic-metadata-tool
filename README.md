@@ -22,7 +22,9 @@ This library supports multiple comic archive formats using different underlying 
   - Read RAR comments (for ComicBookInfo metadata)
   - Extract files from RAR archives
   - Full archive content listing
-- **Platform**: Cross-platform WebAssembly implementation, no external binaries required
+- **Platform**:
+  - Read operations: cross-platform WebAssembly implementation, no external binaries required
+  - Write operations: require `rar` and `unrar` CLI tools available in `PATH`
 
 ### CB7 Files (.cb7, .7z)
 - **External Tool**: 7-Zip binary
@@ -58,8 +60,10 @@ This package includes comprehensive TypeScript definitions and supports both ESM
 ```typescript
 import { 
   readComicFileMetadata, 
+  writeComicFileMetadata,
   type MetadataCompiled, 
   type ReadComicFileMetadataOptions,
+  type WriteComicFileMetadataOptions,
   type ComicInfo,
   type CoMet,
   type ComicBookInfo 
@@ -74,11 +78,85 @@ const metadata: MetadataCompiled = await readComicFileMetadata(filePath);
 ### Importing
 ```js
 // ESM
-import { readComicFileMetadata } from "comic-metadata-tool";
+import { readComicFileMetadata, writeComicFileMetadata } from "comic-metadata-tool";
 
 // CommonJS
-const { readComicFileMetadata } = require("comic-metadata-tool");
+const { readComicFileMetadata, writeComicFileMetadata } = require("comic-metadata-tool");
 ```
+
+### Writing Metadata to an Archive
+
+The write API updates metadata in place.
+
+Default target format behavior:
+- If metadata already exists, it mirrors existing format using this priority:
+  1. ComicInfo.xml
+  2. CoMet.xml
+  3. ComicBookInfo archive comment
+- If no metadata exists, it creates ComicInfo.xml by default.
+
+```js
+const filePath = "/path/to/comic.cbz";
+
+const before = await readComicFileMetadata(filePath, {
+  parseComicInfoXml: true,
+});
+
+const result = await writeComicFileMetadata(filePath, {
+  comicInfoXml: {
+    ...before.comicInfoXml,
+    title: "Updated Title",
+  },
+});
+
+console.log(result);
+// {
+//   archivePath: '/path/to/comic.cbz',
+//   archiveType: 'zip',
+//   writtenFormat: 'comicinfoxml',
+//   createdMetadataFile: false
+// }
+```
+
+Force a specific metadata format:
+
+```js
+await writeComicFileMetadata(
+  "/path/to/comic.cbz",
+  {
+    comicbookinfo: {
+      appID: "MyTool/1.0",
+      lastModified: new Date().toISOString(),
+      "ComicBookInfo/1.0": {
+        series: "Batman",
+        title: "Issue 1",
+        publisher: "DC Comics",
+        publicationMonth: 1,
+        publicationYear: 2026,
+        issue: 1,
+        numberOfIssues: 1,
+        volume: 1,
+        numberOfVolumes: 1,
+        rating: 0,
+        genre: "",
+        language: "",
+        country: "",
+        credits: [],
+        tags: [],
+        comments: "",
+      },
+    },
+  },
+  {
+    format: "comicbookinfo",
+  }
+);
+```
+
+Write support matrix:
+- CBZ/ZIP: ComicInfo.xml, CoMet.xml, ComicBookInfo comment
+- CBR/RAR: ComicInfo.xml, CoMet.xml, ComicBookInfo comment (requires `rar` and `unrar` CLI tools)
+- CB7/7z: ComicInfo.xml, CoMet.xml
 
 ### Reading Metadata from an Archive
 
@@ -367,6 +445,11 @@ example of credits array
 If you encounter issues with 7z file handling on macOS, run:
 ```sh
 chmod +x node_modules/7zip-bin/mac/arm64/7za
+```
+
+If you need CBR write support on macOS, install RAR tools:
+```sh
+brew install rar
 ```
 
 ## License

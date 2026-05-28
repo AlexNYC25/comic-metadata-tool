@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.readComicFileMetadata = readComicFileMetadata;
+exports.writeComicFileMetadata = writeComicFileMetadata;
 const path_1 = __importDefault(require("path"));
 const metadata_service_1 = require("./src/services/metadata-service");
 /**
@@ -24,5 +25,17 @@ async function readComicFileMetadata(filePath, options) {
     const properFilePath = path_1.default.resolve(filePath);
     const returnObj = await (0, metadata_service_1.getComicFileMetadata)(properFilePath, options);
     return returnObj;
+}
+/**
+ * Writes metadata into a comic archive file. The default behavior mirrors the
+ * archive's existing metadata format and falls back to ComicInfo.xml.
+ * @param filePath - The path to the comic file as a string.
+ * @param payload - The metadata payload for one or more supported formats.
+ * @param options - Write options that control format selection.
+ * @returns {Promise<MetadataWriteResult>} - A promise that resolves to the write result.
+ */
+async function writeComicFileMetadata(filePath, payload, options) {
+    const properFilePath = path_1.default.resolve(filePath);
+    return await (0, metadata_service_1.writeComicFileMetadata)(properFilePath, payload, options);
 }
 //# sourceMappingURL=index.js.map

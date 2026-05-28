@@ -11,11 +11,16 @@ exports.doesRarContainJson = doesRarContainJson;
 exports.getXmlFilesFromRar = getXmlFilesFromRar;
 exports.getJsonFilesFromRar = getJsonFilesFromRar;
 exports.getRarEntryContent = getRarEntryContent;
+exports.updateRarComment = updateRarComment;
+exports.upsertRarEntryContent = upsertRarEntryContent;
 const fs_1 = __importDefault(require("fs"));
 const os_1 = __importDefault(require("os"));
 const path_1 = __importDefault(require("path"));
+const child_process_1 = require("child_process");
+const util_1 = require("util");
 const node_unrar_js_1 = require("node-unrar-js");
 const fsp = fs_1.default.promises;
+const execFileAsync = (0, util_1.promisify)(child_process_1.execFile);
 async function getRarContentList(filePath) {
     try {
         // Use file-based extractor to avoid loading entire file into memory
@@ -153,6 +158,73 @@ async function getRarEntryContent(rarPath, entryName) {
     catch (err) {
         console.error("Error extracting RAR entry content:", err);
         throw err;
+    }
+}
+function getTemporaryArchivePath(archivePath) {
+    const archiveDir = path_1.default.dirname(archivePath);
+    const archiveName = path_1.default.basename(archivePath);
+    const uniqueSuffix = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    return path_1.default.join(archiveDir, `${archiveName}.${uniqueSuffix}.tmp`);
+}
+async function ensureRarCliAvailable() {
+    try {
+        await execFileAsync("rar", ["-iver"]);
+        await execFileAsync("unrar", ["-iver"]);
+    }
+    catch {
+        throw new Error('RAR write support requires both "rar" and "unrar" command-line tools.');
+    }
+}
+async function extractRarArchiveToDirectory(archivePath, outputDir) {
+    await execFileAsync("unrar", ["x", "-o+", "-inul", archivePath, outputDir]);
+}
+async function createRarArchiveFromDirectory(sourceDir, outputArchivePath) {
+    await execFileAsync("rar", ["a", "-y", "-r", "-ep1", "-idq", "-inul", outputArchivePath, "."], { cwd: sourceDir });
+}
+async function updateRarComment(archivePath, comment) {
+    await ensureRarCliAvailable();
+    const tempRoot = await fsp.mkdtemp(path_1.default.join(os_1.default.tmpdir(), "rar-comment-"));
+    const commentFile = path_1.default.join(tempRoot, "archive-comment.txt");
+    try {
+        await fsp.writeFile(commentFile, comment, "utf-8");
+        await execFileAsync("rar", [
+            "c",
+            "-y",
+            "-idq",
+            `-z${commentFile}`,
+            archivePath,
+        ]);
+    }
+    finally {
+        await fsp.rm(tempRoot, { recursive: true, force: true });
+    }
+}
+async function upsertRarEntryContent(archivePath, entryName, content) {
+    await ensureRarCliAvailable();
+    const existingComment = await getRarComment(archivePath);
+    const tempRoot = await fsp.mkdtemp(path_1.default.join(os_1.default.tmpdir(), "rar-update-"));
+    const extractedDir = path_1.default.join(tempRoot, "archive");
+    const tempArchivePath = getTemporaryArchivePath(archivePath);
+    try {
+        await fsp.mkdir(extractedDir, { recursive: true });
+        await extractRarArchiveToDirectory(archivePath, extractedDir);
+        const normalizedEntryPath = entryName
+            .split("\\")
+            .join("/")
+            .split("/")
+            .join(path_1.default.sep);
+        const targetPath = path_1.default.join(extractedDir, normalizedEntryPath);
+        await fsp.mkdir(path_1.default.dirname(targetPath), { recursive: true });
+        await fsp.writeFile(targetPath, content, "utf-8");
+        await createRarArchiveFromDirectory(extractedDir, tempArchivePath);
+        if (existingComment.trim().length > 0) {
+            await updateRarComment(tempArchivePath, existingComment);
+        }
+        await fsp.rename(tempArchivePath, archivePath);
+    }
+    finally {
+        await fsp.rm(tempRoot, { recursive: true, force: true });
+        await fsp.rm(tempArchivePath, { force: true });
     }
 }
 //# sourceMappingURL=rar-utils.js.map

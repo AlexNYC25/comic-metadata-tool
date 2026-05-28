@@ -11,6 +11,8 @@ exports.getXmlFilesFromZip = getXmlFilesFromZip;
 exports.getJsonFilesFromZip = getJsonFilesFromZip;
 exports.extractZipEntryToTemp = extractZipEntryToTemp;
 exports.getZipEntryContent = getZipEntryContent;
+exports.upsertZipEntryContent = upsertZipEntryContent;
+exports.updateZipComment = updateZipComment;
 const fs_1 = require("fs");
 const os_1 = __importDefault(require("os"));
 const path_1 = __importDefault(require("path"));
@@ -92,5 +94,22 @@ async function getZipEntryContent(zipPath, entryName) {
     }
     // Get file content directly as string
     return entry.getData().toString("utf-8");
+}
+async function upsertZipEntryContent(zipPath, entryName, content) {
+    const zip = new adm_zip_1.default(zipPath);
+    const entry = zip.getEntry(entryName);
+    const fileContent = Buffer.from(content, "utf-8");
+    if (entry) {
+        zip.updateFile(entryName, fileContent);
+    }
+    else {
+        zip.addFile(entryName, fileContent);
+    }
+    zip.writeZip(zipPath);
+}
+async function updateZipComment(zipPath, zipComment) {
+    const zip = new adm_zip_1.default(zipPath);
+    zip.addZipComment(zipComment);
+    zip.writeZip(zipPath);
 }
 //# sourceMappingURL=zip-utils.js.map

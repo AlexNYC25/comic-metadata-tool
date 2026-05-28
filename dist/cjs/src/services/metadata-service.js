@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getComicFileMetadata = getComicFileMetadata;
+exports.writeComicFileMetadata = writeComicFileMetadata;
 const fs_1 = __importDefault(require("fs"));
 const file_utils_1 = require("../utils/file-utils");
 const zip_utils_1 = require("../utils/zip-utils");
@@ -12,6 +13,7 @@ const _7z_utils_1 = require("../utils/7z-utils");
 const metadata_zip_compile_service_1 = require("./metadata-sub-services/metadata-zip-compile-service");
 const metadata_rar_compile_service_1 = require("./metadata-sub-services/metadata-rar-compile-service");
 const metadata_7z_compile_service_1 = require("./metadata-sub-services/metadata-7z-compile-service");
+const metadata_write_service_1 = require("./metadata-sub-services/metadata-write-service");
 /**
  * Processes metadata for a given archive type, compiling XML and comment metadata as needed with the provided functions.
  * @param metadata - The metadata object to process.
@@ -72,5 +74,18 @@ async function getComicFileMetadata(filePath, options) {
         default:
             throw new Error("Unexpected archive type");
     }
+}
+/**
+ * Service to write metadata back into a comic archive file.
+ * @param filePath - The path to the comic archive file.
+ * @param payload - The metadata payload to write.
+ * @param options - Write options that determine target format behavior.
+ * @returns {Promise<MetadataWriteResult>} - Information about the write operation.
+ */
+async function writeComicFileMetadata(filePath, payload, options) {
+    if (!fs_1.default.existsSync(filePath)) {
+        throw new Error(`File does not exist: ${filePath}`);
+    }
+    return await (0, metadata_write_service_1.writeComicFileMetadataIntoArchive)(filePath, payload, options);
 }
 //# sourceMappingURL=metadata-service.js.map

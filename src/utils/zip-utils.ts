@@ -29,7 +29,7 @@ export async function doesZipContainJson(filePath: string): Promise<boolean> {
   const zip = new AdmZip(filePath);
   const entries = zip.getEntries();
   const jsonFiles = entries.filter((entry) =>
-    entry.entryName.endsWith(".json")
+    entry.entryName.endsWith(".json"),
   );
   return jsonFiles.length > 0;
 }
@@ -45,7 +45,7 @@ export async function getJsonFilesFromZip(filePath: string): Promise<string[]> {
   const zip = new AdmZip(filePath);
   const entries = zip.getEntries();
   const jsonFiles = entries.filter((entry) =>
-    entry.entryName.endsWith(".json")
+    entry.entryName.endsWith(".json"),
   );
   return jsonFiles.map((entry) => entry.entryName);
 }
@@ -53,7 +53,7 @@ export async function getJsonFilesFromZip(filePath: string): Promise<string[]> {
 export async function extractZipEntryToTemp(
   zipPath: string,
   entryName: string,
-  destDir?: string
+  destDir?: string,
 ): Promise<string> {
   // 1. Use file-based constructor to avoid loading entire archive into memory
   const zip = new AdmZip(zipPath);
@@ -93,7 +93,7 @@ export async function extractZipEntryToTemp(
  */
 export async function getZipEntryContent(
   zipPath: string,
-  entryName: string
+  entryName: string,
 ): Promise<string> {
   const zip = new AdmZip(zipPath);
 
@@ -107,4 +107,31 @@ export async function getZipEntryContent(
 
   // Get file content directly as string
   return entry.getData().toString("utf-8");
+}
+
+export async function upsertZipEntryContent(
+  zipPath: string,
+  entryName: string,
+  content: string,
+): Promise<void> {
+  const zip = new AdmZip(zipPath);
+  const entry = zip.getEntry(entryName);
+  const fileContent = Buffer.from(content, "utf-8");
+
+  if (entry) {
+    zip.updateFile(entryName, fileContent);
+  } else {
+    zip.addFile(entryName, fileContent);
+  }
+
+  zip.writeZip(zipPath);
+}
+
+export async function updateZipComment(
+  zipPath: string,
+  zipComment: string,
+): Promise<void> {
+  const zip = new AdmZip(zipPath);
+  zip.addZipComment(zipComment);
+  zip.writeZip(zipPath);
 }

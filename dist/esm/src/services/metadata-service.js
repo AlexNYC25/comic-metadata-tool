@@ -6,6 +6,7 @@ import { does7zContainXml } from "../utils/7z-utils.js";
 import { compileZipArchiveXmlMetadata, compileZipCommentMetadata, } from "./metadata-sub-services/metadata-zip-compile-service.js";
 import { compileRarArchiveXmlMetadata, compileRarCommentMetadata, } from "./metadata-sub-services/metadata-rar-compile-service.js";
 import { compile7zArchiveXmlMetadata } from "./metadata-sub-services/metadata-7z-compile-service.js";
+import { writeComicFileMetadataIntoArchive } from "./metadata-sub-services/metadata-write-service.js";
 /**
  * Processes metadata for a given archive type, compiling XML and comment metadata as needed with the provided functions.
  * @param metadata - The metadata object to process.
@@ -66,5 +67,18 @@ export async function getComicFileMetadata(filePath, options) {
         default:
             throw new Error("Unexpected archive type");
     }
+}
+/**
+ * Service to write metadata back into a comic archive file.
+ * @param filePath - The path to the comic archive file.
+ * @param payload - The metadata payload to write.
+ * @param options - Write options that determine target format behavior.
+ * @returns {Promise<MetadataWriteResult>} - Information about the write operation.
+ */
+export async function writeComicFileMetadata(filePath, payload, options) {
+    if (!fs.existsSync(filePath)) {
+        throw new Error(`File does not exist: ${filePath}`);
+    }
+    return await writeComicFileMetadataIntoArchive(filePath, payload, options);
 }
 //# sourceMappingURL=metadata-service.js.map

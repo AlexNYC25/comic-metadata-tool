@@ -1,6 +1,12 @@
-import { XMLParser, XMLValidator, X2jOptions } from "fast-xml-parser";
+import {
+  XMLBuilder,
+  XMLParser,
+  XMLValidator,
+  X2jOptions,
+} from "fast-xml-parser";
 import { CoMet } from "../interfaces/comet";
 import { ComicInfo } from "../interfaces/comicInfo";
+import { ComicBookInfo } from "../interfaces/comicbookinfo";
 import { ComicPageInfo } from "../interfaces/metadata-parts/comic-page-info";
 import { YesNo } from "../types/yes-no";
 import { Manga } from "../types/manga";
@@ -19,7 +25,7 @@ type RawPagesNode = {
  */
 export function parseXml<T = unknown>(
   xmlContent: string,
-  options: X2jOptions = {}
+  options: X2jOptions = {},
 ): T {
   const validationResult = XMLValidator.validate(xmlContent) as
     | true
@@ -27,7 +33,7 @@ export function parseXml<T = unknown>(
   if (validationResult !== true) {
     const { err } = validationResult;
     throw new Error(
-      `Invalid XML at line ${err.line}, column ${err.col}: ${err.msg}`
+      `Invalid XML at line ${err.line}, column ${err.col}: ${err.msg}`,
     );
   }
 
@@ -175,4 +181,148 @@ export function parseComicInfoXml(xml: string): ComicInfo {
     review: ci.Review as string,
     //GTIN: ci.GTIN as string, // v2.1+
   };
+}
+
+function pruneUndefined<T>(value: T): T {
+  if (Array.isArray(value)) {
+    return value
+      .map((entry) => pruneUndefined(entry))
+      .filter((entry) => entry !== undefined) as T;
+  }
+
+  if (value && typeof value === "object") {
+    const entries = Object.entries(value as Record<string, unknown>)
+      .filter(([, entryValue]) => entryValue !== undefined)
+      .map(([key, entryValue]) => [key, pruneUndefined(entryValue)]);
+
+    return Object.fromEntries(entries) as T;
+  }
+
+  return value;
+}
+
+function getXmlBuilder(): XMLBuilder {
+  return new XMLBuilder({
+    ignoreAttributes: false,
+    format: true,
+    suppressEmptyNode: true,
+  });
+}
+
+function mapComicInfoPagesToXml(pages?: ComicPageInfo[]) {
+  if (!pages || pages.length === 0) {
+    return undefined;
+  }
+
+  return {
+    Page: pages.map((page) =>
+      pruneUndefined({
+        "@_Image": page.Image,
+        "@_Type": page.Type,
+        "@_DoublePage":
+          page.DoublePage === undefined
+            ? undefined
+            : page.DoublePage
+              ? "True"
+              : "False",
+        "@_ImageSize": page.ImageSize,
+        "@_Key": page.Key,
+        "@_Bookmark": page.Bookmark,
+        "@_ImageWidth": page.ImageWidth,
+        "@_ImageHeight": page.ImageHeight,
+      }),
+    ),
+  };
+}
+
+export function serializeComicInfoXml(comicInfo: ComicInfo): string {
+  const comicInfoXmlObject = pruneUndefined({
+    ComicInfo: {
+      Title: comicInfo.title,
+      Series: comicInfo.series,
+      Number: comicInfo.number,
+      Count: comicInfo.count,
+      Volume: comicInfo.volume,
+      AlternateSeries: comicInfo.alternateSeries,
+      AlternateNumber: comicInfo.alternateNumber,
+      AlternateCount: comicInfo.alternateCount,
+      Summary: comicInfo.summary,
+      Notes: comicInfo.notes,
+      Year: comicInfo.year,
+      Month: comicInfo.month,
+      Day: comicInfo.day,
+      Writer: comicInfo.writer,
+      Penciler: comicInfo.penciler,
+      Inker: comicInfo.inker,
+      Colorist: comicInfo.colorist,
+      Letterer: comicInfo.letterer,
+      CoverArtist: comicInfo.coverArtist,
+      Editor: comicInfo.editor,
+      Publisher: comicInfo.publisher,
+      Imprint: comicInfo.imprint,
+      Genre: comicInfo.genre,
+      Web: comicInfo.web,
+      PageCount: comicInfo.pageCount,
+      LanguageISO: comicInfo.languageISO,
+      Format: comicInfo.format,
+      BlackAndWhite: comicInfo.blackAndWhite,
+      Manga: comicInfo.manga,
+      Characters: comicInfo.characters,
+      Teams: comicInfo.teams,
+      Locations: comicInfo.locations,
+      ScanInformation: comicInfo.scanInformation,
+      StoryArc: comicInfo.storyArc,
+      SeriesGroup: comicInfo.seriesGroup,
+      AgeRating: comicInfo.ageRating,
+      Pages: mapComicInfoPagesToXml(comicInfo.pages),
+      CommunityRating: comicInfo.communityRating,
+      MainCharacterOrTeam: comicInfo.mainCharacterOrTeam,
+      Review: comicInfo.review,
+    },
+  });
+
+  return `<?xml version="1.0" encoding="utf-8"?>\n${getXmlBuilder().build(comicInfoXmlObject)}`;
+}
+
+export function serializeCoMetXml(coMet: CoMet): string {
+  const coMetXmlObject = pruneUndefined({
+    comet: {
+      title: coMet.title,
+      description: coMet.description,
+      series: coMet.series,
+      issue: coMet.issue,
+      volume: coMet.volume,
+      publisher: coMet.publisher,
+      date: coMet.date,
+      genre: coMet.genre,
+      character: coMet.character,
+      isVersionOf: coMet.isVersionOf,
+      price: coMet.price,
+      format: coMet.format,
+      language: coMet.language,
+      rating: coMet.rating,
+      rights: coMet.rights,
+      identifier: coMet.identifier,
+      pages: coMet.pages,
+      creator: coMet.creator,
+      writer: coMet.writer,
+      penciler: coMet.penciler,
+      editor: coMet.editor,
+      coverDesigner: coMet.coverDesigner,
+      letterer: coMet.letterer,
+      inker: coMet.inker,
+      colorist: coMet.colorist,
+      coverImage: coMet.coverImage,
+      lastMark: coMet.lastMark,
+      readingDirection: coMet.readingDirection,
+    },
+  });
+
+  return `<?xml version="1.0" encoding="utf-8"?>\n${getXmlBuilder().build(coMetXmlObject)}`;
+}
+
+export function serializeComicBookInfoComment(
+  comicbookinfo: ComicBookInfo,
+): string {
+  return JSON.stringify(comicbookinfo);
 }

@@ -12,4 +12,6 @@ export declare function extractZipEntryToTemp(zipPath: string, entryName: string
  * @returns {Promise<string>} - The content of the file as a string.
  */
 export declare function getZipEntryContent(zipPath: string, entryName: string): Promise<string>;
+export declare function upsertZipEntryContent(zipPath: string, entryName: string, content: string): Promise<void>;
+export declare function updateZipComment(zipPath: string, zipComment: string): Promise<void>;
 //# sourceMappingURL=zip-utils.d.ts.map

@@ -10,13 +10,17 @@ exports.does7zContainJson = does7zContainJson;
 exports.getXmlFilesFrom7z = getXmlFilesFrom7z;
 exports.getJsonFilesFrom7z = getJsonFilesFrom7z;
 exports.get7zEntryContent = get7zEntryContent;
+exports.upsert7zEntryContent = upsert7zEntryContent;
 // zip-utils.ts
 const fs_1 = __importDefault(require("fs"));
 const os_1 = __importDefault(require("os"));
 const path_1 = __importDefault(require("path"));
+const child_process_1 = require("child_process");
+const util_1 = require("util");
 const node_7z_1 = __importDefault(require("node-7z"));
 const _7zip_bin_1 = __importDefault(require("7zip-bin"));
 const fsp = fs_1.default.promises;
+const execFileAsync = (0, util_1.promisify)(child_process_1.execFile);
 async function get7zContentList(filePath) {
     return new Promise((resolve, reject) => {
         const files = [];
@@ -99,6 +103,44 @@ async function get7zEntryContent(archivePath, entryName) {
         catch {
             // Ignore cleanup errors
         }
+    }
+}
+async function extract7zArchiveToDirectory(archivePath, outputDir) {
+    await fsp.mkdir(outputDir, { recursive: true });
+    const extractStream = node_7z_1.default.extractFull(archivePath, outputDir, {
+        $bin: _7zip_bin_1.default.path7za,
+    });
+    await new Promise((resolve, reject) => {
+        extractStream.on("end", () => resolve());
+        extractStream.on("error", (error) => reject(error));
+    });
+}
+async function create7zArchiveFromDirectory(sourceDir, outputArchivePath) {
+    await execFileAsync(_7zip_bin_1.default.path7za, ["a", "-t7z", "-y", "-bd", outputArchivePath, "."], {
+        cwd: sourceDir,
+    });
+}
+function getTemporaryArchivePath(archivePath) {
+    const archiveDir = path_1.default.dirname(archivePath);
+    const archiveName = path_1.default.basename(archivePath);
+    const uniqueSuffix = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    return path_1.default.join(archiveDir, `${archiveName}.${uniqueSuffix}.tmp`);
+}
+async function upsert7zEntryContent(archivePath, entryName, content) {
+    const tempRoot = await fsp.mkdtemp(path_1.default.join(os_1.default.tmpdir(), "7z-update-"));
+    const extractedDir = path_1.default.join(tempRoot, "archive");
+    const tempArchivePath = getTemporaryArchivePath(archivePath);
+    try {
+        await extract7zArchiveToDirectory(archivePath, extractedDir);
+        const targetPath = path_1.default.join(extractedDir, entryName);
+        await fsp.mkdir(path_1.default.dirname(targetPath), { recursive: true });
+        await fsp.writeFile(targetPath, content, "utf-8");
+        await create7zArchiveFromDirectory(extractedDir, tempArchivePath);
+        await fsp.rename(tempArchivePath, archivePath);
+    }
+    finally {
+        await fsp.rm(tempRoot, { recursive: true, force: true });
+        await fsp.rm(tempArchivePath, { force: true });
     }
 }
 //# sourceMappingURL=7z-utils.js.map

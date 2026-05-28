@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.2]
+
+### Fixed
+- Updated workflow to generate the lock file if not provided
+- Updated the gitignore file to allow lock files to be generated and committed to the repo, since they are needed for the publish workflow to run properly
+
 ## [1.3.1]
 
 ### Added
@@ -97,7 +103,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - async function to parse metadata from comic book archives (cbz, cbr, cb7) in widely used formats
 - tests and example metadata for development purposes
 
-[unreleased]: https://github.com/AlexNYC25/comic-metadata-tool/compare/v1.3.1...HEAD
+[unreleased]: https://github.com/AlexNYC25/comic-metadata-tool/compare/v1.3.2...HEAD
+[1.3.2]: https://github.com/AlexNYC25/comic-metadata-tool/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/AlexNYC25/comic-metadata-tool/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/AlexNYC25/comic-metadata-tool/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/AlexNYC25/comic-metadata-tool/compare/v1.2.0...v1.2.1

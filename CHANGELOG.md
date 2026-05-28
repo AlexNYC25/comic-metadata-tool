@@ -7,12 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.1]
+
+### Fixed
+- Fixed typo repo wide from "pencillers" to "pencilers
+
 ## [1.2.0]
 
 ### Added
 - Added expanded support for both esm and cjs during build process
-- Seperate typescript configs for esm, cjs and types
-= Addes seperate script to help with the build process to fix esm files for js
+- Separate typescript configs for esm, cjs and types
+= Adds separate script to help with the build process to fix esm files for js
 
 ### Changed
 - Updated exports to have proper main, module and types fields
@@ -59,7 +64,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed package.json to have correct main entry point from absolute path to relateive path
+- Fixed package.json to have correct main entry point from absolute path to relative path
 
 ### Changed
 
@@ -70,9 +75,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - async function to parse metadata from comic book archives (cbz, cbr, cb7) in widely used formats
-- tests and example metadata for deveolpment purposes
+- tests and example metadata for development purposes
 
 [unreleased]: https://github.com/AlexNYC25/comic-metadata-tool/compare/v1.2.0...HEAD
+[1.2.1]: https://github.com/AlexNYC25/comic-metadata-tool/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/AlexNYC25/comic-metadata-tool/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/AlexNYC25/comic-metadata-tool/compare/v1.0.4...v1.1.0
 [1.0.4]: https://github.com/AlexNYC25/comic-metadata-tool/compare/v1.0.3...v1.0.4

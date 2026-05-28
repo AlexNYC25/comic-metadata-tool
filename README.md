@@ -166,7 +166,7 @@ comicInfoXml: {
     month: '11',
     day: '30',
     writer: 'Scott Snyder',
-    penciller: 'Greg Capullo,Greg Capullo',
+    penciler: 'Greg Capullo,Greg Capullo',
     inker: 'Jonathan Glapion',
     colorist: 'FCO Plascencia',
     letterer: 'Jimmy Betancourt',
@@ -285,7 +285,7 @@ Example of one of the objects in the 'pages' array
   pages: [ 30 ],
   creator: [],
   writer: [ 'Scott Snyder' ],
-  penciller: [ 'Greg Capullo', 'Greg Capullo' ],
+  penciler: [ 'Greg Capullo', 'Greg Capullo' ],
   editor: [
     'Janelle Asselin (Siegel)',
     'Katie Kubert',
@@ -344,7 +344,7 @@ example of credits array
 ```js
 [
   { person: 'Scott Snyder', role: 'Writer', primary: false },
-  { person: 'Greg Capullo', role: 'Penciller', primary: false },
+  { person: 'Greg Capullo', role: 'Penciler', primary: false },
   { person: 'Jonathan Glapion', role: 'Inker', primary: false },
   { person: 'FCO Plascencia', role: 'Colorist', primary: false },
   { person: 'Jimmy Betancourt', role: 'Letterer', primary: false },

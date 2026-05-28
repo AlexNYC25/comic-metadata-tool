@@ -86,7 +86,7 @@ export function parseCometXml(xml: string): CoMet {
     pages: ensureArray(c.pages as number | number[]),
     creator: ensureArray(c.creator as string | string[]),
     writer: ensureArray(c.writer as string | string[]),
-    penciller: ensureArray(c.penciller as string | string[]),
+    penciler: ensureArray(c.penciler as string | string[]),
     editor: ensureArray(c.editor as string | string[]),
     coverDesigner: ensureArray(c.coverDesigner as string | string[]),
     letterer: ensureArray(c.letterer as string | string[]),
@@ -144,7 +144,7 @@ export function parseComicInfoXml(xml: string): ComicInfo {
     month: ci.Month as number,
     day: ci.Day as number, // v2+
     writer: ci.Writer as string,
-    penciller: ci.Penciller as string,
+    penciler: ci.Penciler as string,
     inker: ci.Inker as string,
     colorist: ci.Colorist as string,
     letterer: ci.Letterer as string,

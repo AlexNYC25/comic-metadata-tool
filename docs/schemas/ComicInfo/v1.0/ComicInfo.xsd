@@ -16,7 +16,7 @@
             <xs:element minOccurs="0" maxOccurs="1" default="-1" name="Year" type="xs:int"/>
             <xs:element minOccurs="0" maxOccurs="1" default="-1" name="Month" type="xs:int"/>
             <xs:element minOccurs="0" maxOccurs="1" default="" name="Writer" type="xs:string"/>
-            <xs:element minOccurs="0" maxOccurs="1" default="" name="Penciller" type="xs:string"/>
+            <xs:element minOccurs="0" maxOccurs="1" default="" name="Penciler" type="xs:string"/>
             <xs:element minOccurs="0" maxOccurs="1" default="" name="Inker" type="xs:string"/>
             <xs:element minOccurs="0" maxOccurs="1" default="" name="Colorist" type="xs:string"/>
             <xs:element minOccurs="0" maxOccurs="1" default="" name="Letterer" type="xs:string"/>

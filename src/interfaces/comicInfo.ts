@@ -24,7 +24,7 @@ export interface ComicInfo {
   day?: number;
 
   writer?: string;
-  penciller?: string;
+  penciler?: string;
   inker?: string;
   colorist?: string;
   letterer?: string;

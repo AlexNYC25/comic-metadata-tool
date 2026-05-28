@@ -18,7 +18,7 @@ export interface ComicInfoRawXML {
     /** v2 only */
     Day?: number;
     Writer?: string;
-    Penciller?: string;
+    Penciler?: string;
     Inker?: string;
     Colorist?: string;
     Letterer?: string;

@@ -27,7 +27,7 @@
                 <xs:element name="pages" type="xs:positiveInteger" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element name="creator" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element name="writer" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-                <xs:element name="penciller" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="penciler" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element name="editor" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element name="coverDesigner" type="xs:string" minOccurs="0"/>
                 <xs:element name="letterer" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>

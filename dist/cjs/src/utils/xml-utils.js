@@ -69,7 +69,7 @@ function parseCometXml(xml) {
         pages: ensureArray(c.pages),
         creator: ensureArray(c.creator),
         writer: ensureArray(c.writer),
-        penciller: ensureArray(c.penciller),
+        penciler: ensureArray(c.penciler),
         editor: ensureArray(c.editor),
         coverDesigner: ensureArray(c.coverDesigner),
         letterer: ensureArray(c.letterer),
@@ -123,7 +123,7 @@ function parseComicInfoXml(xml) {
         month: ci.Month,
         day: ci.Day, // v2+
         writer: ci.Writer,
-        penciller: ci.Penciller,
+        penciler: ci.Penciler,
         inker: ci.Inker,
         colorist: ci.Colorist,
         letterer: ci.Letterer,

@@ -56,8 +56,8 @@ export interface CoMet {
   /** `<writer>` (0..∞) */
   writer?: string[];
 
-  /** `<penciller>` (0..∞) */
-  penciller?: string[];
+  /** `<penciler>` (0..∞) */
+  penciler?: string[];
 
   /** `<editor>` (0..∞) */
   editor?: string[];

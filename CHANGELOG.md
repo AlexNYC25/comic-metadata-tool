@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.3]
+### Fixed
+- Updated npm publish workflow to use the correct node/action versions
+
+### Removed
+- Removed old publish workflow that was using incorrect node/action versions and had issues with generating lock files
+
 ## [1.3.2]
 
 ### Fixed
@@ -103,7 +110,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - async function to parse metadata from comic book archives (cbz, cbr, cb7) in widely used formats
 - tests and example metadata for development purposes
 
-[unreleased]: https://github.com/AlexNYC25/comic-metadata-tool/compare/v1.3.2...HEAD
+[unreleased]: https://github.com/AlexNYC25/comic-metadata-tool/compare/v1.3.3...HEAD
+[1.3.3]: https://github.com/AlexNYC25/comic-metadata-tool/compare/v1.3.2...v1.3.3
 [1.3.2]: https://github.com/AlexNYC25/comic-metadata-tool/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/AlexNYC25/comic-metadata-tool/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/AlexNYC25/comic-metadata-tool/compare/v1.2.1...v1.3.0
